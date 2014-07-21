@@ -89,19 +89,7 @@ public class FloatingActionMenu {
                 // Make item view invisible, just in case
                 item.view.setAlpha(0);
                 // Wait for the right time
-                item.view.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Measure the size of the item view
-                        item.width = item.view.getMeasuredWidth();
-                        item.height = item.view.getMeasuredHeight();
-
-                        // Revert everything back to normal
-                        item.view.setAlpha(1);
-                        // Remove the item view from view hierarchy
-                        ((ViewGroup) getActivityContentView()).removeView(item.view);
-                    }
-                });
+                item.view.post(new ItemViewQueueListener(item));
             }
         }
     }
@@ -290,6 +278,38 @@ public class FloatingActionMenu {
         @Override
         public void onClick(View v) {
             toggle(animated);
+        }
+    }
+
+    /**
+     * This runnable calculates sizes of Item views that are added to the menu.
+     */
+    private class ItemViewQueueListener implements Runnable {
+
+        private static final int MAX_TRIES = 10;
+        private Item item;
+        private int tries;
+
+        public ItemViewQueueListener(Item item) {
+            this.item = item;
+            this.tries = 0;
+        }
+
+        @Override
+        public void run() {
+            // Wait until the the view can be measured but do not push too hard.
+            if(item.view.getMeasuredWidth() == 0 && tries < MAX_TRIES) {
+                item.view.post(this);
+                return;
+            }
+            // Measure the size of the item view
+            item.width = item.view.getMeasuredWidth();
+            item.height = item.view.getMeasuredHeight();
+
+            // Revert everything back to normal
+            item.view.setAlpha(1);
+            // Remove the item view from view hierarchy
+            ((ViewGroup) getActivityContentView()).removeView(item.view);
         }
     }
 
