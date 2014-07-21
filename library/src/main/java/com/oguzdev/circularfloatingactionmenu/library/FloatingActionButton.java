@@ -43,8 +43,9 @@ public class FloatingActionButton extends FrameLayout {
      * @param backgroundDrawable
      * @param position
      * @param contentView
+     * @param contentParams
      */
-    public FloatingActionButton(Activity activity, LayoutParams layoutParams, int theme, Drawable backgroundDrawable, int position, View contentView) {
+    public FloatingActionButton(Activity activity, LayoutParams layoutParams, int theme, Drawable backgroundDrawable, int position, View contentView, FrameLayout.LayoutParams contentParams) {
         super(activity);
         setPosition(position, layoutParams);
 
@@ -57,7 +58,7 @@ public class FloatingActionButton extends FrameLayout {
         }
         setBackgroundResource(backgroundDrawable);
         if(contentView != null) {
-            setContentView(contentView);
+            setContentView(contentView, contentParams);
         }
         setClickable(true);
 
@@ -106,12 +107,19 @@ public class FloatingActionButton extends FrameLayout {
      * Sets a content view that will be displayed inside this FloatingActionButton.
      * @param contentView
      */
-    public void setContentView(View contentView) {
+    public void setContentView(View contentView, FrameLayout.LayoutParams contentParams) {
         this.contentView = contentView;
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
-        final int margin = getResources().getDimensionPixelSize(R.dimen.action_button_content_margin);
-        params.setMargins(margin, margin, margin, margin);
-        contentView.setLayoutParams(params);
+        FrameLayout.LayoutParams params;
+        if(contentParams == null ){
+            params =new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+            final int margin = getResources().getDimensionPixelSize(R.dimen.action_button_content_margin);
+            params.setMargins(margin, margin, margin, margin);
+        }
+        else {
+            params = contentParams;
+        }
+        params.gravity = Gravity.CENTER;
+
         contentView.setClickable(false);
         this.addView(contentView, params);
     }
@@ -159,6 +167,7 @@ public class FloatingActionButton extends FrameLayout {
         private Drawable backgroundDrawable;
         private int position;
         private View contentView;
+        private LayoutParams contentParams;
 
         public Builder(Activity activity) {
             this.activity = activity;
@@ -198,7 +207,12 @@ public class FloatingActionButton extends FrameLayout {
         }
 
         public Builder setContentView(View contentView) {
+            return setContentView(contentView, null);
+        }
+
+        public Builder setContentView(View contentView, LayoutParams contentParams) {
             this.contentView = contentView;
+            this.contentParams = contentParams;
             return this;
         }
 
@@ -208,7 +222,8 @@ public class FloatingActionButton extends FrameLayout {
                                            theme,
                                            backgroundDrawable,
                                            position,
-                                           contentView);
+                                           contentView,
+                                           contentParams);
         }
     }
 
