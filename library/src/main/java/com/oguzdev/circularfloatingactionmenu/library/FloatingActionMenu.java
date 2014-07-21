@@ -4,11 +4,13 @@
 package com.oguzdev.circularfloatingactionmenu.library;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -354,10 +356,33 @@ public class FloatingActionMenu {
             return this;
         }
 
+        /**
+         * Adds a sub action view that is already alive, but not added to a parent View.
+         * @param subActionView a view for the menu
+         * @return
+         */
         public Builder addSubActionView(View subActionView) {
             return this.addSubActionView(subActionView, 0, 0);
         }
 
+        /**
+         * Inflates a new view from the specified resource id and adds it as a sub action view.
+         * @param resId the resource id reference for the view
+         * @param context a valid context
+         * @return
+         */
+        public Builder addSubActionView(int resId, Context context) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(resId, null, false);
+            view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            return this.addSubActionView(view, view.getMeasuredWidth(), view.getMeasuredHeight());
+        }
+
+        /**
+         * Sets the current animation handler to the specified MenuAnimationHandler child
+         * @param animationHandler a MenuAnimationHandler child
+         * @return
+         */
         public Builder setAnimationHandler(MenuAnimationHandler animationHandler) {
             this.animationHandler = animationHandler;
             return this;
@@ -373,6 +398,12 @@ public class FloatingActionMenu {
             return this;
         }
 
+        /**
+         * Attaches the whole menu around a main action view, usually a button.
+         * All the calculations are made according to this action view.
+         * @param actionView
+         * @return
+         */
         public Builder attachTo(View actionView) {
             this.actionView = actionView;
             return this;
