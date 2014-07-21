@@ -188,6 +188,10 @@ public class FloatingActionButton extends FrameLayout {
             return this;
         }
 
+        public Builder setBackgroundDrawable(int drawableId) {
+            return setBackgroundDrawable(activity.getResources().getDrawable(drawableId));
+        }
+
         public Builder setPosition(int position) {
             this.position = position;
             return this;
