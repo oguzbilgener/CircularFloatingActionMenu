@@ -23,7 +23,7 @@ public class SubActionButton extends FrameLayout {
     public static final int THEME_LIGHTER = 2;
     public static final int THEME_DARKER = 3;
 
-    public SubActionButton(Activity activity, LayoutParams layoutParams, int theme, Drawable backgroundDrawable, View contentView) {
+    public SubActionButton(Activity activity, FrameLayout.LayoutParams layoutParams, int theme, Drawable backgroundDrawable, View contentView) {
         super(activity);
         setLayoutParams(layoutParams);
         // If no custom backgroundDrawable is specified, use the background drawable of the theme.
@@ -82,7 +82,7 @@ public class SubActionButton extends FrameLayout {
     public static class Builder {
 
         private Activity activity;
-        private LayoutParams layoutParams;
+        private FrameLayout.LayoutParams layoutParams;
         private int theme;
         private Drawable backgroundDrawable;
         private View contentView;
@@ -92,12 +92,12 @@ public class SubActionButton extends FrameLayout {
 
             // Default SubActionButton settings
             int size = activity.getResources().getDimensionPixelSize(R.dimen.sub_action_button_size);
-            LayoutParams params = new LayoutParams(size, size, Gravity.TOP | Gravity.LEFT);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size, Gravity.TOP | Gravity.LEFT);
             setLayoutParams(params);
             setTheme(SubActionButton.THEME_LIGHT);
         }
 
-        public Builder setLayoutParams(LayoutParams params) {
+        public Builder setLayoutParams(FrameLayout.LayoutParams params) {
             this.layoutParams = params;
             return this;
         }
@@ -123,29 +123,6 @@ public class SubActionButton extends FrameLayout {
                     theme,
                     backgroundDrawable,
                     contentView);
-        }
-    }
-
-    public static class LayoutParams extends FrameLayout.LayoutParams {
-
-        public LayoutParams(Context c, AttributeSet attrs) {
-            super(c, attrs);
-        }
-
-        public LayoutParams(int width, int height) {
-            super(width, height);
-        }
-
-        public LayoutParams(int width, int height, int gravity) {
-            super(width, height, gravity);
-        }
-
-        public LayoutParams(ViewGroup.LayoutParams source) {
-            super(source);
-        }
-
-        public LayoutParams(MarginLayoutParams source) {
-            super(source);
         }
     }
 }
