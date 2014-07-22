@@ -87,7 +87,9 @@ public class DefaultAnimationHandler extends MenuAnimationHandler {
             animation.setInterpolator(new AccelerateDecelerateInterpolator());
             animation.addListener(new SubActionItemAnimationListener(menu.getSubActionItems().get(i), ActionType.CLOSING));
 
-            lastAnimation = animation;
+            if(i == 0) {
+                lastAnimation = animation;
+            }
 
             animation.setStartDelay((menu.getSubActionItems().size() - i) * LAG_BETWEEN_ITEMS);
             animation.start();
