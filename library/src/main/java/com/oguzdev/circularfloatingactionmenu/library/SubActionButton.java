@@ -44,6 +44,9 @@ public class SubActionButton extends FrameLayout {
                 throw new RuntimeException("Unknown SubActionButton theme: " + theme);
             }
         }
+        else {
+            backgroundDrawable = backgroundDrawable.mutate().getConstantState().newDrawable();
+        }
         setBackgroundResource(backgroundDrawable);
         if(contentView != null) {
             setContentView(contentView);
