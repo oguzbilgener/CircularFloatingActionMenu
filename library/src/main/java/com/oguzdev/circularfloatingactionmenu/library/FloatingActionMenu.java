@@ -229,18 +229,18 @@ public class FloatingActionMenu {
         PathMeasure measure = new PathMeasure(orbit, false);
 
         // Prevent overlapping when it is a full circle
-        int divider;
+        int divisor;
         if(Math.abs(endAngle - startAngle) >= 360) {
-            divider = subActionItems.size();
+            divisor = subActionItems.size();
         }
         else {
-            divider = subActionItems.size() -1;
+            divisor = subActionItems.size() -1;
         }
 
         // Measure this path, in order to find points that have the same distance between each other
         for(int i=0; i<subActionItems.size(); i++) {
             float[] coords = new float[] {0f, 0f};
-            measure.getPosTan((i) * measure.getLength() / divider, coords, null);
+            measure.getPosTan((i) * measure.getLength() / divisor, coords, null);
             // get the x and y values of these points and set them to each of sub action items.
             subActionItems.get(i).x = (int) coords[0] - subActionItems.get(i).width / 2;
             subActionItems.get(i).y = (int) coords[1] - subActionItems.get(i).height / 2;
