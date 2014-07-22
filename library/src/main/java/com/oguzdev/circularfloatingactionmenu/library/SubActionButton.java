@@ -4,13 +4,10 @@
 package com.oguzdev.circularfloatingactionmenu.library;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 /**
@@ -23,7 +20,7 @@ public class SubActionButton extends FrameLayout {
     public static final int THEME_LIGHTER = 2;
     public static final int THEME_DARKER = 3;
 
-    public SubActionButton(Activity activity, FrameLayout.LayoutParams layoutParams, int theme, Drawable backgroundDrawable, View contentView) {
+    public SubActionButton(Activity activity, FrameLayout.LayoutParams layoutParams, int theme, Drawable backgroundDrawable, View contentView, FrameLayout.LayoutParams contentParams) {
         super(activity);
         setLayoutParams(layoutParams);
         // If no custom backgroundDrawable is specified, use the background drawable of the theme.
@@ -49,22 +46,33 @@ public class SubActionButton extends FrameLayout {
         }
         setBackgroundResource(backgroundDrawable);
         if(contentView != null) {
-            setContentView(contentView);
+            setContentView(contentView, contentParams);
         }
         setClickable(true);
     }
 
     /**
-     * Sets a content view that will be displayed inside this SubActionButton.
+     * Sets a content view with custom LayoutParams that will be displayed inside this SubActionButton.
+     * @param contentView
+     * @param params
+     */
+    public void setContentView(View contentView, FrameLayout.LayoutParams params) {
+        if(params == null) {
+            params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+            final int margin = getResources().getDimensionPixelSize(R.dimen.sub_action_button_content_margin);
+            params.setMargins(margin, margin, margin, margin);
+        }
+
+        contentView.setClickable(false);
+        this.addView(contentView, params);
+    }
+
+    /**
+     * Sets a content view with default LayoutParams
      * @param contentView
      */
     public void setContentView(View contentView) {
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
-        final int margin = getResources().getDimensionPixelSize(R.dimen.sub_action_button_content_margin);
-        params.setMargins(margin, margin, margin, margin);
-        contentView.setLayoutParams(params);
-        contentView.setClickable(false);
-        this.addView(contentView, params);
+        setContentView(contentView, null);
     }
 
     private void setBackgroundResource(Drawable drawable) {
@@ -86,6 +94,7 @@ public class SubActionButton extends FrameLayout {
         private int theme;
         private Drawable backgroundDrawable;
         private View contentView;
+        private FrameLayout.LayoutParams contentParams;
 
         public Builder(Activity activity) {
             this.activity = activity;
@@ -117,12 +126,19 @@ public class SubActionButton extends FrameLayout {
             return this;
         }
 
+        public Builder setContentView(View contentView, FrameLayout.LayoutParams contentParams) {
+            this.contentView = contentView;
+            this.contentParams = contentParams;
+            return this;
+        }
+
         public SubActionButton build() {
             return new SubActionButton(activity,
                     layoutParams,
                     theme,
                     backgroundDrawable,
-                    contentView);
+                    contentView,
+                    contentParams);
         }
     }
 }
