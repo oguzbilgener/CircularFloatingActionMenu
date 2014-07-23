@@ -9,7 +9,7 @@ An animated, customizable circular floating menu for Android, inspired by Path a
 - API >= 15
 
 ### Installation
-Grab the library via Maven Central (*soon*), or add `library` as a sub module to your project.
+Clone the repo and `library` as a module to your project. AAR file is coming to Maven Central *soon*.
 
 ### Usage
 CircularFloatingActionMenu can be attached to **any view** in your layout. A Floating Action Button implementation is available in the library, with a similar look to new Material Design's FAB. 
