@@ -1,0 +1,17 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="red_action_button_size">108dp</dimen>
+    <dimen name="red_action_button_margin">48dp</dimen>
+
+    <dimen name="red_action_button_content_size">16dp</dimen>
+    <dimen name="red_action_button_content_margin">36dp</dimen>
+
+    <dimen name="red_action_menu_radius">144dp</dimen>
+    <dimen name="blue_sub_action_button_size">48dp</dimen>
+    <dimen name="blue_sub_action_button_content_margin">16dp</dimen>
+
+    <dimen name="radius_large">120dp</dimen>
+</resources>

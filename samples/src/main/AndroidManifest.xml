@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.oguzdev.circularfloatingactionmenu.samples" >
+
+    <uses-sdk tools:node="replace" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".DemoActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MenuWithFABActivity"
+            android:label="@string/title_activity_menu_with_fab"
+            android:parentActivityName=".DemoActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.oguzdev.circularfloatingactionmenu.samples.DemoActivity" />
+        </activity>
+        <activity
+            android:name=".MenuWithCustomActionButtonActivity"
+            android:label="@string/title_activity_menu_with_custom_action_button"
+            android:parentActivityName=".DemoActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.oguzdev.circularfloatingactionmenu.samples.DemoActivity" />
+        </activity>
+        <activity
+            android:name=".MenuWithCustomAnimationActivity"
+            android:label="@string/title_activity_menu_with_custom_animation"
+            android:parentActivityName=".DemoActivity"
+            android:theme="@style/AppThemeDark">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.oguzdev.circularfloatingactionmenu.samples.DemoActivity" />
+        </activity>
+    </application>
+
+</manifest>
