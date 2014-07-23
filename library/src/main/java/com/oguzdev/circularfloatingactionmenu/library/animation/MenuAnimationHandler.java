@@ -80,7 +80,7 @@ public abstract class MenuAnimationHandler {
      * A special animation listener that is intended to listen the last of the sequential animations.
      * Changes the animating property of children.
      */
-    protected class LastAnimationListener implements Animator.AnimatorListener {
+    public class LastAnimationListener implements Animator.AnimatorListener {
 
         @Override
         public void onAnimationStart(Animator animation) {
