@@ -27,7 +27,7 @@ FloatingActionButton actionButton = new FloatingActionButton.Builder(this)
 	
 ```
 
-2 - Create a menu items:
+2 - Create menu items:
 
 ```java
 SubActionButton.Builder itemBuilder = new SubActionButton.Builder(this);
@@ -64,8 +64,8 @@ Existing `FloatingActionButton` and `SubActionButton` views are customizable too
 
 `FloatingActionButton` can be placed to one of **8 predefined positions** on the screen. To place it somewhere else, extend it!
 
-<img src="assets/customizableButtons.png" height="400">
-<img src="assets/customViews.png" height="400">
+<img src="assets/customizableButtons.png" height="500">
+<img src="assets/customViews.png" height="500">
 
 ### Custom Animations
 You can write your own animation handler class by extending from `MenuAnimationHandler` to completely customize menu opening and closing animations.
