@@ -55,7 +55,9 @@ public class DefaultAnimationHandler extends MenuAnimationHandler {
             animation.setInterpolator(new OvershootInterpolator(0.9f));
             animation.addListener(new SubActionItemAnimationListener(menu.getSubActionItems().get(i), ActionType.OPENING));
 
-            lastAnimation = animation;
+            if(i == 0) {
+                lastAnimation = animation;
+            }
 
             // Put a slight lag between each of the menu items to make it asymmetric
             animation.setStartDelay((menu.getSubActionItems().size() - i) * LAG_BETWEEN_ITEMS);
