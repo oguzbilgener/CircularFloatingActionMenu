@@ -34,7 +34,7 @@ SubActionButton.Builder itemBuilder = new SubActionButton.Builder(this);
 // repeat many times:
 ImageView itemIcon = new ImageView(this);
 itemIcon.setImageDrawable( ... ); 
-SubActionButton button1 = itemBuilder.setContentView(button1).build();
+SubActionButton button1 = itemBuilder.setContentView(itemIcon).build();
  
 ```
 
@@ -53,7 +53,7 @@ And you're ready to go!
 ## Customization
 **Animations**, **start angle**, **end angle** and **radius** are customizable via `FloatingActionMenu.Builder`.
 
-`FloatingActionMenu` is the essential class for the menu. Other two classes, `FloatingActionButton` and `SubActionButton` are just **Views** and they can be replaced with any other View. You are completely free to create your own menu button and item views.
+`FloatingActionMenu` is the essential class for the menu. Other two classes, `FloatingActionButton` and `SubActionButton` are just **views** and they can be replaced with any other view. You are completely free to create your own menu button and item views.
 
 Existing `FloatingActionButton` and `SubActionButton` views are customizable too. These parameters can be changed via Builders of both classes:
 
