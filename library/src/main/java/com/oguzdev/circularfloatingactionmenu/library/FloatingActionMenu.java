@@ -230,7 +230,7 @@ public class FloatingActionMenu {
 
         // Prevent overlapping when it is a full circle
         int divisor;
-        if(Math.abs(endAngle - startAngle) >= 360) {
+        if(Math.abs(endAngle - startAngle) >= 360 || subActionItems.size() <= 1) {
             divisor = subActionItems.size();
         }
         else {
