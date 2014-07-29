@@ -38,9 +38,11 @@ public class FloatingActionMenu {
     private ArrayList<Item> subActionItems;
     /** Reference to the preferred {@link MenuAnimationHandler} object */
     private MenuAnimationHandler animationHandler;
-    /**  */
+    /** Reference to a listener that listens open/close actions */
+    private MenuStateChangeListener stateChangeListener;
+    /** whether the openings and closings should be animated or not */
     private boolean animated;
-    /** */
+    /** whether the menu is currently open or not */
     private boolean open;
 
     /**
@@ -59,7 +61,8 @@ public class FloatingActionMenu {
                               int radius,
                               ArrayList<Item> subActionItems,
                               MenuAnimationHandler animationHandler,
-                              boolean animated) {
+                              boolean animated,
+                              MenuStateChangeListener stateChangeListener) {
         this.mainActionView = mainActionView;
         this.startAngle = startAngle;
         this.endAngle = endAngle;
@@ -69,6 +72,8 @@ public class FloatingActionMenu {
         this.animated = animated;
         // The menu is initially closed.
         this.open = false;
+
+        this.stateChangeListener = stateChangeListener;
 
         // Listen click events on the main action view
         // In the future, touch and drag events could be listened to offer an alternative behaviour
@@ -142,6 +147,10 @@ public class FloatingActionMenu {
         }
         // do not forget to specify that the menu is open.
         open = true;
+
+        if(stateChangeListener != null) {
+            stateChangeListener.onMenuOpened(this);
+        }
     }
 
     /**
@@ -165,6 +174,10 @@ public class FloatingActionMenu {
         }
         // do not forget to specify that the menu is now closed.
         open = false;
+
+        if(stateChangeListener != null) {
+            stateChangeListener.onMenuClosed(this);
+        }
     }
 
     /**
@@ -279,6 +292,10 @@ public class FloatingActionMenu {
         return size;
     }
 
+    public void setStateChangeListener(MenuStateChangeListener listener) {
+        this.stateChangeListener = listener;
+    }
+
     /**
      * A simple click listener used by the main action view
      */
@@ -343,6 +360,14 @@ public class FloatingActionMenu {
     }
 
     /**
+     * A listener to listen open/closed state changes of the Menu
+     */
+    public static interface MenuStateChangeListener {
+        public void onMenuOpened(FloatingActionMenu menu);
+        public void onMenuClosed(FloatingActionMenu menu);
+    }
+
+    /**
      * A builder for {@link FloatingActionMenu} in conventional Java Builder format
      */
     public static class Builder {
@@ -354,6 +379,7 @@ public class FloatingActionMenu {
         private ArrayList<Item> subActionItems;
         private MenuAnimationHandler animationHandler;
         private boolean animated;
+        private MenuStateChangeListener stateChangeListener;
 
         public Builder(Activity activity) {
             subActionItems = new ArrayList<Item>();
@@ -427,6 +453,11 @@ public class FloatingActionMenu {
             return this;
         }
 
+        public Builder setStateChangeListener(MenuStateChangeListener listener) {
+            stateChangeListener = listener;
+            return this;
+        }
+
         /**
          * Attaches the whole menu around a main action view, usually a button.
          * All the calculations are made according to this action view.
@@ -445,7 +476,8 @@ public class FloatingActionMenu {
                                           radius,
                                           subActionItems,
                                           animationHandler,
-                                          animated);
+                                          animated,
+                                          stateChangeListener);
         }
     }
 }
