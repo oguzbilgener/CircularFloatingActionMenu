@@ -201,6 +201,26 @@ public class FloatingActionMenu {
     }
 
     /**
+     * Recalculates the positions of each sub action item on demand.
+     */
+    public void updateItemPositions() {
+        // Only update if the menu is currently open
+        if(!isOpen()) {
+            return;
+        }
+        // recalculate x,y coordinates of Items
+        calculateItemPositions();
+
+        // Simply update layout params for each item
+        for (int i = 0; i < subActionItems.size(); i++) {
+            // This is currently done by giving them large margins
+            final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(subActionItems.get(i).width, subActionItems.get(i).height, Gravity.TOP | Gravity.LEFT);
+            params.setMargins(subActionItems.get(i).x, subActionItems.get(i).y, 0, 0);
+            subActionItems.get(i).view.setLayoutParams(params);
+        }
+    }
+
+    /**
      * Gets the coordinates of the main action view
      * This method should only be called after the main layout of the Activity is drawn,
      * such as when a user clicks the action button.
