@@ -13,7 +13,7 @@ Grab the AAR from Maven Central by adding it as a dependency in your **build.gra
 
 ```groovy
 dependencies {
-    compile 'com.oguzdev:CircularFloatingActionMenu:1.0'
+    compile 'com.oguzdev:CircularFloatingActionMenu:1.0.1'
 }
 ```
 Alternatively, clone the repo and add `library` as a module to your project.
