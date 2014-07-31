@@ -64,6 +64,7 @@ public class DemoActivity extends Activity {
             String[] items = { "Menu with FloatingActionBar",
                                "Menu attached to custom button",
                                "Menu with custom animation",
+                               "Menu in ScrollView"
                             };
             ArrayAdapter<String> simpleAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, items);
             demosListView = (ListView) rootView.findViewById(R.id.demosListView);
@@ -83,6 +84,9 @@ public class DemoActivity extends Activity {
                     break;
                 case 2:
                     startActivity(new Intent(getActivity(), MenuWithCustomAnimationActivity.class));
+                    break;
+                case 3:
+                    startActivity(new Intent(getActivity(), MenuInScrollViewActivity.class));
                     break;
             }
         }

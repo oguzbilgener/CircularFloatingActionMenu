@@ -14,4 +14,6 @@
     <dimen name="blue_sub_action_button_content_margin">16dp</dimen>
 
     <dimen name="radius_large">120dp</dimen>
+    <dimen name="radius_small">30dp</dimen>
+    <dimen name="radius_medium">72dp</dimen>
 </resources>

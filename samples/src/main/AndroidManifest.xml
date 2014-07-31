@@ -39,7 +39,15 @@
             android:name=".MenuWithCustomAnimationActivity"
             android:label="@string/title_activity_menu_with_custom_animation"
             android:parentActivityName=".DemoActivity"
-            android:theme="@style/AppThemeDark">
+            android:theme="@style/AppThemeDark" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.oguzdev.circularfloatingactionmenu.samples.DemoActivity" />
+        </activity>
+        <activity
+            android:name=".MenuInScrollViewActivity"
+            android:label="@string/title_activity_menu_in_scroll_view"
+            android:parentActivityName=".DemoActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.oguzdev.circularfloatingactionmenu.samples.DemoActivity" />

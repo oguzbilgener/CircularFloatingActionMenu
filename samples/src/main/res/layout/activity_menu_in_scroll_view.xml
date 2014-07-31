@@ -1,0 +1,65 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context="com.oguzdev.circularfloatingactionmenu.samples.MenuInScrollViewActivity">
+
+    <RelativeLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bottom_bar_background">
+
+        <FrameLayout
+            android:id="@+id/bottom_bar_action_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/button_action_blue_selector"
+            android:clickable="true"
+            android:layout_alignParentLeft="true">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:src="@drawable/ic_action_new" />
+        </FrameLayout>
+
+        <ImageButton
+            android:id="@+id/bottom_bar_send_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_margin="6dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_action_send_now_light"
+            style="?android:attr/buttonBarButtonStyle" />
+
+        <EditText
+            android:id="@+id/buttom_bar_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:layout_toRightOf="@id/bottom_bar_action_button"
+            android:layout_toLeftOf="@id/bottom_bar_send_button"
+            android:hint="Tap on items above!" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomBar"
+        >
+        <LinearLayout
+            android:id="@+id/scrollViewBody"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

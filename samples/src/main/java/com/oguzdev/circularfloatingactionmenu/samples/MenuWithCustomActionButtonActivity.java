@@ -1,6 +1,5 @@
 package com.oguzdev.circularfloatingactionmenu.samples;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -59,7 +58,7 @@ public class MenuWithCustomActionButtonActivity extends Activity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_menu_with_custom_action_button, container, false);
 
             // Our action button is this time just a regular view!
@@ -87,19 +86,19 @@ public class MenuWithCustomActionButtonActivity extends Activity {
             SubActionButton.Builder subBuilder = new SubActionButton.Builder(getActivity());
 
             FloatingActionMenu circleMenu = new FloatingActionMenu.Builder(getActivity())
-                              .setStartAngle(0) // A whole circle!
-                              .setEndAngle(360)
-                              .setRadius(getResources().getDimensionPixelSize(R.dimen.radius_large))
-                              .addSubActionView(a)
-                              .addSubActionView(b)
-                              .addSubActionView(c)
-                              .addSubActionView(d)
-                              .addSubActionView(e)
-                              .addSubActionView(f)
-                              .addSubActionView(g)
-                              .addSubActionView(h)
-                              .attachTo(centerActionButton)
-                              .build();
+                    .setStartAngle(0) // A whole circle!
+                    .setEndAngle(360)
+                    .setRadius(getResources().getDimensionPixelSize(R.dimen.radius_large))
+                    .addSubActionView(a)
+                    .addSubActionView(b)
+                    .addSubActionView(c)
+                    .addSubActionView(d)
+                    .addSubActionView(e)
+                    .addSubActionView(f)
+                    .addSubActionView(g)
+                    .addSubActionView(h)
+                    .attachTo(centerActionButton)
+                    .build();
 
             return rootView;
         }
