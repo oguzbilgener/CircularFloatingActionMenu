@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -230,9 +231,10 @@ public class FloatingActionMenu {
         int[] coords = new int[2];
         // This method returns a x and y values that can be larger than the dimensions of the device screen.
         mainActionView.getLocationOnScreen(coords);
+        Rect activityFrame = new Rect(); getActivityContentView().getWindowVisibleDisplayFrame(activityFrame);
         // So, we need to deduce the offsets.
         coords[0] -= (getScreenSize().x - getActivityContentView().getMeasuredWidth());
-        coords[1] -= (getScreenSize().y - getActivityContentView().getMeasuredHeight());
+        coords[1] -= (activityFrame.height() + activityFrame.top - getActivityContentView().getMeasuredHeight());
         return new Point(coords[0], coords[1]);
     }
 
@@ -403,7 +405,7 @@ public class FloatingActionMenu {
 
         public Builder(Activity activity) {
             subActionItems = new ArrayList<Item>();
-
+            // Default settings
             radius = activity.getResources().getDimensionPixelSize(R.dimen.action_menu_radius);
             startAngle = 180;
             endAngle = 270;
