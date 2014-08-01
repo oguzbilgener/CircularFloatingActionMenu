@@ -61,7 +61,7 @@ public class DemoActivity extends Activity {
                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_demo, container, false);
 
-            String[] items = { "Menu with FloatingActionBar",
+            String[] items = { "Menu with FloatingActionButton",
                                "Menu attached to custom button",
                                "Menu with custom animation",
                                "Menu in ScrollView"
