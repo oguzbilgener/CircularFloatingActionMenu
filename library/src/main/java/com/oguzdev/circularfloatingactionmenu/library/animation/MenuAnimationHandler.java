@@ -57,7 +57,7 @@ public abstract class MenuAnimationHandler {
      * @param actionType
      */
     protected void restoreSubActionViewAfterAnimation(FloatingActionMenu.Item subActionItem, ActionType actionType) {
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) subActionItem.view.getLayoutParams();
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(subActionItem.view.getLayoutParams());
         subActionItem.view.setTranslationX(0);
         subActionItem.view.setTranslationY(0);
         subActionItem.view.setRotation(0);
