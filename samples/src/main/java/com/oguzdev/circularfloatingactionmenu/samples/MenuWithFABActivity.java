@@ -114,7 +114,7 @@ public class MenuWithFABActivity extends Activity {
         SubActionButton build4 = lCSubBuilder.setContentView(lcIcon4, blueContentParams).build();
         SubActionButton build5 = lCSubBuilder.setContentView(lcIcon5, blueContentParams).build();
 
-        build3.setVisibility(View.GONE);
+        build3.setVisibility(View.INVISIBLE);
         
         FloatingActionMenu leftCenterMenu = new FloatingActionMenu.Builder(this)
                 .addSubActionView(build1)
