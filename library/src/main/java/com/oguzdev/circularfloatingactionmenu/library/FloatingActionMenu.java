@@ -89,7 +89,6 @@ public class FloatingActionMenu {
 
         // Find items with undefined sizes
         for(final Item item : subActionItems) {
-            if (View.GONE != item.view.getVisibility()) {
                 if (item.width == 0 || item.height == 0) {
                     // Figure out the size by temporarily adding it to the Activity content view hierarchy
                     // and ask the size from the system
@@ -99,7 +98,6 @@ public class FloatingActionMenu {
                     // Wait for the right time
                     item.view.post(new ItemViewQueueListener(item));
                 }
-            }
         }
     }
 
@@ -125,7 +123,6 @@ public class FloatingActionMenu {
                 // Because they are supposed to be added to the Activity content view,
                 // just before the animation starts
                 Item item = subActionItems.get(i);
-                if (View.GONE != item.view.getVisibility()) {
                     if (item.view.getParent() != null) {
                         throw new RuntimeException("All of the sub action items have to be independent from a parent.");
                     }
@@ -136,8 +133,10 @@ public class FloatingActionMenu {
                     params.setMargins(center.x - item.width / 2, center.y - item.height / 2, 0, 0);
                     //
                     ((ViewGroup) getActivityContentView()).addView(item.view, params);
-                }
             }
+
+            getActivityContentView().invalidate();
+            getActivityContentView().requestLayout();
             // Tell the current MenuAnimationHandler to animate from the center
             animationHandler.animateMenuOpening(center);
         }
@@ -145,7 +144,6 @@ public class FloatingActionMenu {
             // If animations are disabled, just place each of the items to their calculated destination positions.
             for (int i = 0; i < subActionItems.size(); i++) {
                 Item item = subActionItems.get(i);
-                if (View.GONE != item.view.getVisibility()) {
                     // This is currently done by giving them large margins
                     final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(item.width, item.height, Gravity.TOP | Gravity.LEFT);
                     params.setMargins(item.x, item.y, 0, 0);
@@ -153,7 +151,6 @@ public class FloatingActionMenu {
                     // Because they are placed into the main content view of the Activity,
                     // which is itself a FrameLayout
                     ((ViewGroup) getActivityContentView()).addView(item.view, params);
-                }
             }
         }
         // do not forget to specify that the menu is open.
@@ -181,9 +178,7 @@ public class FloatingActionMenu {
             // If animations are disabled, just detach each of the Item views from the Activity content view.
             for (int i = 0; i < subActionItems.size(); i++) {
                 Item item = subActionItems.get(i);
-                //if (View.GONE != item.view.getVisibility()) {
-                    ((ViewGroup) getActivityContentView()).removeView(item.view);
-                //}
+                ((ViewGroup) getActivityContentView()).removeView(item.view);
             }
         }
         // do not forget to specify that the menu is now closed.
@@ -229,7 +224,7 @@ public class FloatingActionMenu {
         for (int i = 0; i < subActionItems.size(); i++) {
             // This is currently done by giving them large margins
             Item item = subActionItems.get(i);
-            if (View.GONE != item.view.getVisibility()) {
+            if (View.INVISIBLE != item.view.getVisibility()) {
                 final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(item.width, item.height, Gravity.TOP | Gravity.LEFT);
                 params.setMargins(item.x, item.y, 0, 0);
                 item.view.setLayoutParams(params);
@@ -289,12 +284,13 @@ public class FloatingActionMenu {
             divisor = size -1;
         }
 
+        int visibleCounter = 0;
         // Measure this path, in order to find points that have the same distance between each other
         for(int i=0; i<subActionItems.size(); i++) {
             Item item = subActionItems.get(i);
-            if (View.GONE != item.view.getVisibility()) {
+            if (View.INVISIBLE != item.view.getVisibility()) {
                 float[] coords = new float[] {0f, 0f};
-                measure.getPosTan((i) * measure.getLength() / divisor, coords, null);
+                measure.getPosTan((visibleCounter++) * measure.getLength() / divisor, coords, null);
                 // get the x and y values of these points and set them to each of sub action items.
                 item.x = (int) coords[0] - item.width / 2;
                 item.y = (int) coords[1] - item.height / 2;
@@ -306,7 +302,7 @@ public class FloatingActionMenu {
         int size = 0;
         for(int i=0; i<subActionItems.size(); i++) {
             Item item = subActionItems.get(i);
-            if (View.GONE != item.view.getVisibility()) {
+            if (View.INVISIBLE != item.view.getVisibility()) {
                 size ++;
             }
         }
