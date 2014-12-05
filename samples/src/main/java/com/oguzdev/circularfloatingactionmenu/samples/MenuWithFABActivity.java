@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -107,12 +108,20 @@ public class MenuWithFABActivity extends Activity {
         lcIcon5.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_headphones));
 
         // Build another menu with custom options
+        SubActionButton build1 = lCSubBuilder.setContentView(lcIcon1, blueContentParams).build();
+        SubActionButton build2 = lCSubBuilder.setContentView(lcIcon2, blueContentParams).build();
+        SubActionButton build3 = lCSubBuilder.setContentView(lcIcon3, blueContentParams).build();
+        SubActionButton build4 = lCSubBuilder.setContentView(lcIcon4, blueContentParams).build();
+        SubActionButton build5 = lCSubBuilder.setContentView(lcIcon5, blueContentParams).build();
+
+        build3.setVisibility(View.INVISIBLE);
+        
         FloatingActionMenu leftCenterMenu = new FloatingActionMenu.Builder(this)
-                .addSubActionView(lCSubBuilder.setContentView(lcIcon1, blueContentParams).build())
-                .addSubActionView(lCSubBuilder.setContentView(lcIcon2, blueContentParams).build())
-                .addSubActionView(lCSubBuilder.setContentView(lcIcon3, blueContentParams).build())
-                .addSubActionView(lCSubBuilder.setContentView(lcIcon4, blueContentParams).build())
-                .addSubActionView(lCSubBuilder.setContentView(lcIcon5, blueContentParams).build())
+                .addSubActionView(build1)
+                .addSubActionView(build2)
+                .addSubActionView(build3)
+                .addSubActionView(build4)
+                .addSubActionView(build5)
                 .setRadius(redActionMenuRadius)
                 .setStartAngle(70)
                 .setEndAngle(-70)
