@@ -355,7 +355,7 @@ public class FloatingActionMenu {
             item.height = item.view.getMeasuredHeight();
 
             // Revert everything back to normal
-            item.view.setAlpha(1);
+            item.view.setAlpha(item.alpha);
             // Remove the item view from view hierarchy
             ((ViewGroup) getActivityContentView()).removeView(item.view);
         }
@@ -370,12 +370,15 @@ public class FloatingActionMenu {
         public int width;
         public int height;
 
+        public float alpha;
+
         public View view;
 
         public Item(View view, int width, int height) {
             this.view = view;
             this.width = width;
             this.height = height;
+            alpha = view.getAlpha();
             x = 0;
             y = 0;
         }
