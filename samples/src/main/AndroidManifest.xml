@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.oguzdev.circularfloatingactionmenu.samples" >
 
-    <uses-sdk tools:node="replace" />
 
     <application
         android:allowBackup="true"
