@@ -7,7 +7,7 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
+!gradle/*.jar
 *.war
 *.ear
 
