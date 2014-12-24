@@ -34,7 +34,7 @@ public class FloatingActionButton extends FrameLayout {
 
     private View contentView;
 
-    private boolean systemWindow;
+    private boolean systemOverlay;
 
     /**
      * Constructor that takes parameters collected using {@link FloatingActionMenu.Builder}
@@ -49,13 +49,13 @@ public class FloatingActionButton extends FrameLayout {
     public FloatingActionButton(Context context, ViewGroup.LayoutParams layoutParams, int theme,
                                 Drawable backgroundDrawable, int position, View contentView,
                                 FrameLayout.LayoutParams contentParams,
-                                boolean systemWindow) {
+                                boolean systemOverlay) {
         super(context);
-        this.systemWindow = systemWindow;
+        this.systemOverlay = systemOverlay;
 
-        if(systemWindow && context instanceof Activity) {
+        if(!systemOverlay && context instanceof Activity) {
             throw new RuntimeException("Given context must be an instance of Activity, "
-                    +"since this FAB is not a systemWindow.");
+                    +"since this FAB is not a systemOverlay.");
         }
 
         setPosition(position, layoutParams);
@@ -111,13 +111,13 @@ public class FloatingActionButton extends FrameLayout {
                 gravity = Gravity.BOTTOM | Gravity.RIGHT;
                 break;
         }
-        if(!systemWindow) {
+        if(!systemOverlay) {
             try {
                 FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) layoutParams;
                 lp.gravity = gravity;
             } catch (ClassCastException e) {
                 throw new ClassCastException("layoutParams must be an instance of " +
-                        "FrameLayout.LayoutParams, since this FAB is not a systemWindow");
+                        "FrameLayout.LayoutParams, since this FAB is not a systemOverlay");
             }
         }
         else {
@@ -126,7 +126,7 @@ public class FloatingActionButton extends FrameLayout {
                 lp.gravity = gravity;
             } catch(ClassCastException e) {
                 throw new ClassCastException("layoutParams must be an instance of " +
-                        "WindowManager.LayoutParams, since this FAB is a systemWindow");
+                        "WindowManager.LayoutParams, since this FAB is a systemOverlay");
             }
         }
         setLayoutParams(layoutParams);
@@ -158,7 +158,7 @@ public class FloatingActionButton extends FrameLayout {
      * @param layoutParams
      */
     public void attach(ViewGroup.LayoutParams layoutParams) {
-        if(systemWindow) {
+        if(systemOverlay) {
             try {
                 getWindowManager().addView(this, layoutParams);
             }
@@ -175,7 +175,7 @@ public class FloatingActionButton extends FrameLayout {
      * Detaches it from the container view.
      */
     public void detach() {
-        if(systemWindow) {
+        if(systemOverlay) {
             getWindowManager().removeView(this);
         }
         else {
@@ -216,7 +216,7 @@ public class FloatingActionButton extends FrameLayout {
         private int position;
         private View contentView;
         private LayoutParams contentParams;
-        private boolean systemWindow;
+        private boolean systemOverlay;
 
         public Builder(Context context) {
             this.context = context;
@@ -229,7 +229,7 @@ public class FloatingActionButton extends FrameLayout {
             setLayoutParams(layoutParams);
             setTheme(FloatingActionButton.THEME_LIGHT);
             setPosition(FloatingActionButton.POSITION_BOTTOM_RIGHT);
-            setSystemWindow(false);
+            setSystemOverlay(false);
         }
 
         public Builder setLayoutParams(ViewGroup.LayoutParams params) {
@@ -266,8 +266,8 @@ public class FloatingActionButton extends FrameLayout {
             return this;
         }
 
-        public Builder setSystemWindow(boolean systemWindow) {
-            this.systemWindow = systemWindow;
+        public Builder setSystemOverlay(boolean systemOverlay) {
+            this.systemOverlay = systemOverlay;
             return this;
         }
 
@@ -279,7 +279,7 @@ public class FloatingActionButton extends FrameLayout {
                                            position,
                                            contentView,
                                            contentParams,
-                                           systemWindow);
+                    systemOverlay);
         }
 
         public static WindowManager.LayoutParams getDefaultSystemWindowParams(Context context) {
