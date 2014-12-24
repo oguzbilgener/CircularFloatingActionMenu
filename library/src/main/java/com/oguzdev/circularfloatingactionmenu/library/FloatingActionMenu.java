@@ -111,10 +111,10 @@ public class FloatingActionMenu {
      * @param animated if true, this action is executed by the current {@link MenuAnimationHandler}
      */
     public void open(boolean animated) {
-        // Find the center of the action view
-        Point center = getActionViewCenter();
+
+        // Get the center of the action view from the following function for efficiency
         // populate destination x,y coordinates of Items
-        calculateItemPositions();
+        Point center = calculateItemPositions();
 
         if(animated && animationHandler != null) {
             // If animations are enabled and we have a MenuAnimationHandler, let it do the heavy work
@@ -257,11 +257,11 @@ public class FloatingActionMenu {
 
     /**
      * Calculates the desired positions of all items.
+     * @return getActionViewCenter()
      */
-    private void calculateItemPositions() {
         // Create an arc that starts from startAngle and ends at endAngle
         // in an area that is as large as 4*radius^2
-        Point center = getActionViewCenter();
+        final Point center = getActionViewCenter();
         RectF area = new RectF(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
 
         Path orbit = new Path();
@@ -286,6 +286,7 @@ public class FloatingActionMenu {
             subActionItems.get(i).x = (int) coords[0] - subActionItems.get(i).width / 2;
             subActionItems.get(i).y = (int) coords[1] - subActionItems.get(i).height / 2;
         }
+        return center;
     }
 
     /**
