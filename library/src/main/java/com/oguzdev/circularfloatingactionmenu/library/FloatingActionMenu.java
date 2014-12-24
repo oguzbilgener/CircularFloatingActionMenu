@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.oguzdev.circularfloatingactionmenu.library.animation.DefaultAnimationHandler;
@@ -46,6 +47,8 @@ public class FloatingActionMenu {
     private boolean animated;
     /** whether the menu is currently open or not */
     private boolean open;
+    /** whether the menu is an overlay for all other activities */
+    private boolean systemOverlay;
 
     /**
      * Constructor that takes the parameters collected using {@link FloatingActionMenu.Builder}
@@ -64,7 +67,8 @@ public class FloatingActionMenu {
                               List<Item> subActionItems,
                               MenuAnimationHandler animationHandler,
                               boolean animated,
-                              MenuStateChangeListener stateChangeListener) {
+                              MenuStateChangeListener stateChangeListener,
+                              boolean systemOverlay) {
         this.mainActionView = mainActionView;
         this.startAngle = startAngle;
         this.endAngle = endAngle;
@@ -72,6 +76,7 @@ public class FloatingActionMenu {
         this.subActionItems = subActionItems;
         this.animationHandler = animationHandler;
         this.animated = animated;
+        this.systemOverlay = systemOverlay;
         // The menu is initially closed.
         this.open = false;
 
@@ -306,6 +311,41 @@ public class FloatingActionMenu {
     }
 
     /**
+     * Intended to use for systemOverlay mode.
+     * @return the WindowManager for the current context.
+     */
+    public WindowManager getWindowManager() {
+        return (WindowManager) mainActionView.getContext().getSystemService(Context.WINDOW_SERVICE);
+    }
+
+    private void addViewToCurrentContainer(View view, ViewGroup.LayoutParams layoutParams) {
+        if(systemOverlay) {
+            try {
+                WindowManager.LayoutParams lp = (WindowManager.LayoutParams) layoutParams;
+                getWindowManager().addView(view, lp);
+            }
+            catch(ClassCastException e) {
+                throw new ClassCastException("layoutParams must be an instance of " +
+                        "WindowManager.LayoutParams, since this menu item view is " +
+                        "supposed to be a systemOverlay");
+            }
+            catch(RuntimeException e) {
+                throw new RuntimeException("Your application must have SYSTEM_ALERT_WINDOW " +
+                        "permission to create a system window.");
+            }
+        }
+        else {
+            try {
+                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) layoutParams;
+                // TODO: fill here
+            }
+            catch(RuntimeException e) {
+
+            }
+        }
+    }
+
+    /**
      * Retrieves the screen size from the Activity context
      * @return the screen size as a Point object
      */
@@ -406,6 +446,7 @@ public class FloatingActionMenu {
         private MenuAnimationHandler animationHandler;
         private boolean animated;
         private MenuStateChangeListener stateChangeListener;
+        private boolean systemOverlay;
 
         public Builder(Activity activity) {
             subActionItems = new ArrayList<Item>();
@@ -484,6 +525,11 @@ public class FloatingActionMenu {
             return this;
         }
 
+        public Builder setSystemOverlay(boolean systemOverlay) {
+            this.systemOverlay = systemOverlay;
+            return this;
+        }
+
         /**
          * Attaches the whole menu around a main action view, usually a button.
          * All the calculations are made according to this action view.
@@ -503,7 +549,8 @@ public class FloatingActionMenu {
                                           subActionItems,
                                           animationHandler,
                                           animated,
-                                          stateChangeListener);
+                                          stateChangeListener,
+                                          systemOverlay);
         }
     }
 }

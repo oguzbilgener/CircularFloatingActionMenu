@@ -53,7 +53,7 @@ public class FloatingActionButton extends FrameLayout {
         super(context);
         this.systemOverlay = systemOverlay;
 
-        if(!systemOverlay && context instanceof Activity) {
+        if(!systemOverlay && !(context instanceof Activity)) {
             throw new RuntimeException("Given context must be an instance of Activity, "
                     +"since this FAB is not a systemOverlay.");
         }
@@ -163,7 +163,8 @@ public class FloatingActionButton extends FrameLayout {
                 getWindowManager().addView(this, layoutParams);
             }
             catch(RuntimeException e) {
-                throw new RuntimeException("Your application must have SYSTEM_ALERT_WINDOW permission to create a system window.");
+                throw new RuntimeException("Your application must have SYSTEM_ALERT_WINDOW " +
+                        "permission to create a system window.");
             }
         }
         else {
