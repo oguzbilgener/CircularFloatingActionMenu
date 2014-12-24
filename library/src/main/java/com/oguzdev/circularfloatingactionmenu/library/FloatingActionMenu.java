@@ -20,6 +20,7 @@ import com.oguzdev.circularfloatingactionmenu.library.animation.DefaultAnimation
 import com.oguzdev.circularfloatingactionmenu.library.animation.MenuAnimationHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides the main structure of the menu.
@@ -36,7 +37,7 @@ public class FloatingActionMenu {
     /** Distance of menu items from mainActionView */
     private int radius;
     /** List of menu items */
-    private ArrayList<Item> subActionItems;
+    private List<Item> subActionItems;
     /** Reference to the preferred {@link MenuAnimationHandler} object */
     private MenuAnimationHandler animationHandler;
     /** Reference to a listener that listens open/close actions */
@@ -60,7 +61,7 @@ public class FloatingActionMenu {
                               int startAngle,
                               int endAngle,
                               int radius,
-                              ArrayList<Item> subActionItems,
+                              List<Item> subActionItems,
                               MenuAnimationHandler animationHandler,
                               boolean animated,
                               MenuStateChangeListener stateChangeListener) {
@@ -292,7 +293,7 @@ public class FloatingActionMenu {
     /**
      * @return a reference to the sub action items list
      */
-    public ArrayList<Item> getSubActionItems() {
+    public List<Item> getSubActionItems() {
         return subActionItems;
     }
 
@@ -401,7 +402,7 @@ public class FloatingActionMenu {
         private int endAngle;
         private int radius;
         private View actionView;
-        private ArrayList<Item> subActionItems;
+        private List<Item> subActionItems;
         private MenuAnimationHandler animationHandler;
         private boolean animated;
         private MenuStateChangeListener stateChangeListener;
