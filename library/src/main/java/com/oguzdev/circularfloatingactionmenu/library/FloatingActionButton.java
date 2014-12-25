@@ -162,8 +162,8 @@ public class FloatingActionButton extends FrameLayout {
             try {
                 getWindowManager().addView(this, layoutParams);
             }
-            catch(RuntimeException e) {
-                throw new RuntimeException("Your application must have SYSTEM_ALERT_WINDOW " +
+            catch(SecurityException e) {
+                throw new SecurityException("Your application must have SYSTEM_ALERT_WINDOW " +
                         "permission to create a system window.");
             }
         }
@@ -189,7 +189,12 @@ public class FloatingActionButton extends FrameLayout {
      * @return the main content view
      */
     public View getActivityContentView() {
-        return ((Activity) getContext()).getWindow().getDecorView().findViewById(android.R.id.content);
+        try {
+            return ((Activity) getContext()).getWindow().getDecorView().findViewById(android.R.id.content);
+        }
+        catch(ClassCastException e) {
+            throw new ClassCastException("Please provide an Activity context for this FloatingActionButton.");
+        }
     }
 
     public WindowManager getWindowManager() {
