@@ -53,6 +53,8 @@ public class FloatingActionMenu {
     /** whether the menu is an overlay for all other activities */
     private boolean systemOverlay;
 
+    private FrameLayout overlayContainer;
+
     /**
      * Constructor that takes the parameters collected using {@link FloatingActionMenu.Builder}
      * @param mainActionView
@@ -146,7 +148,7 @@ public class FloatingActionMenu {
                     params.height = subActionItems.get(i).height;
                     params.gravity = Gravity.TOP | Gravity.LEFT;
                     params.x = center.x - subActionItems.get(i).width / 2;
-                    params.y= center.y - subActionItems.get(i).height / 2;
+                    params.y = center.y - subActionItems.get(i).height / 2;
 
                     addViewToCurrentContainer(subActionItems.get(i).view, params);
                 }
@@ -164,7 +166,6 @@ public class FloatingActionMenu {
             // If animations are disabled, just place each of the items to their calculated destination positions.
             for (int i = 0; i < subActionItems.size(); i++) {
                 // This is currently done by giving them large margins
-                // TODO: support WindowManager.LayoutParams
                 if(systemOverlay) {
                     final WindowManager.LayoutParams params = getDefaultSystemWindowParams();
 
@@ -243,6 +244,17 @@ public class FloatingActionMenu {
     }
 
     /**
+     * @return whether the menu is a system overlay or not
+     */
+    public boolean isSystemOverlay() {
+        return systemOverlay;
+    }
+
+    public FrameLayout getOverlayContainer() {
+        return overlayContainer;
+    }
+
+    /**
      * Recalculates the positions of each sub action item on demand.
      */
     public void updateItemPositions() {
@@ -270,18 +282,12 @@ public class FloatingActionMenu {
      */
     private Point getActionViewCoordinates() {
         int[] coords = new int[2];
-        // TODO: support WindowManager
         // This method returns a x and y values that can be larger than the dimensions of the device screen.
         mainActionView.getLocationOnScreen(coords);
 
-        DisplayMetrics metrics = new DisplayMetrics();
-
-//        System.out.println(activityFrame.width()+" "+activityFrame.height()+" | "+metrics.widthPixels+" "+metrics.heightPixels);
-
-        System.out.println(coords[0]+" "+coords[1]);
         // So, we need to deduce the offsets.
         if(systemOverlay) {
-            coords[1] -= 50;
+            coords[1] -= getStatusBarHeight();
         }
         else {
             Rect activityFrame = new Rect();
@@ -334,6 +340,11 @@ public class FloatingActionMenu {
             // get the x and y values of these points and set them to each of sub action items.
             subActionItems.get(i).x = (int) coords[0] - subActionItems.get(i).width / 2;
             subActionItems.get(i).y = (int) coords[1] - subActionItems.get(i).height / 2;
+
+            if(systemOverlay) {
+                // Android does not allow system overlay windows to be positioned outside of the screen
+                // TODO: hide items that have some of their parts out of the screen
+            }
         }
         return center;
     }
@@ -406,11 +417,20 @@ public class FloatingActionMenu {
         }
     }
 
-    private void addViewToCurrentContainer(View view) {
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = mainActionView.getContext().getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = mainActionView.getContext().getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    public void addViewToCurrentContainer(View view) {
         addViewToCurrentContainer(view, null);
     }
 
-    private void removeViewFromCurrentContainer(View view) {
+    public void removeViewFromCurrentContainer(View view) {
         if(systemOverlay) {
             getWindowManager().removeView(view);
         }

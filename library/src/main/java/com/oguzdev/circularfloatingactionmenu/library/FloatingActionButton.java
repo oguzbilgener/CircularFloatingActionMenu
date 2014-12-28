@@ -115,6 +115,7 @@ public class FloatingActionButton extends FrameLayout {
             try {
                 FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) layoutParams;
                 lp.gravity = gravity;
+                setLayoutParams(lp);
             } catch (ClassCastException e) {
                 throw new ClassCastException("layoutParams must be an instance of " +
                         "FrameLayout.LayoutParams, since this FAB is not a systemOverlay");
@@ -124,12 +125,12 @@ public class FloatingActionButton extends FrameLayout {
             try {
                 WindowManager.LayoutParams lp = (WindowManager.LayoutParams) layoutParams;
                 lp.gravity = gravity;
+                setLayoutParams(lp);
             } catch(ClassCastException e) {
                 throw new ClassCastException("layoutParams must be an instance of " +
                         "WindowManager.LayoutParams, since this FAB is a systemOverlay");
             }
         }
-        setLayoutParams(layoutParams);
     }
 
     /**

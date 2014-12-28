@@ -6,6 +6,7 @@ package com.oguzdev.circularfloatingactionmenu.library.animation;
 import android.animation.Animator;
 import android.graphics.Point;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
@@ -51,13 +52,13 @@ public abstract class MenuAnimationHandler {
     }
 
     /**
-     * Restores the specified sub action view to its final state, accoding to the current actionType
+     * Restores the specified sub action view to its final state, according to the current actionType
      * Should be called after an animation finishes.
      * @param subActionItem
      * @param actionType
      */
     protected void restoreSubActionViewAfterAnimation(FloatingActionMenu.Item subActionItem, ActionType actionType) {
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) subActionItem.view.getLayoutParams();
+        ViewGroup.LayoutParams params = subActionItem.view.getLayoutParams();
         subActionItem.view.setTranslationX(0);
         subActionItem.view.setTranslationY(0);
         subActionItem.view.setRotation(0);
@@ -65,14 +66,33 @@ public abstract class MenuAnimationHandler {
         subActionItem.view.setScaleY(1);
         subActionItem.view.setAlpha(1);
         if(actionType == ActionType.OPENING) {
-            params.setMargins(subActionItem.x, subActionItem.y, 0, 0);
-            subActionItem.view.setLayoutParams(params);
+            if(menu.isSystemOverlay()) {
+                WindowManager.LayoutParams lp = (WindowManager.LayoutParams) params;
+                lp.x = subActionItem.x;
+                lp.y = subActionItem.y;
+                subActionItem.view.setLayoutParams(lp);
+            }
+            else {
+                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) params;
+                lp.setMargins(subActionItem.x, subActionItem.y, 0, 0);
+                subActionItem.view.setLayoutParams(lp);
+            }
         }
         else if(actionType == ActionType.CLOSING) {
             Point center = menu.getActionViewCenter();
-            params.setMargins(center.x - subActionItem.width / 2, center.y - subActionItem.height / 2, 0, 0);
-            subActionItem.view.setLayoutParams(params);
-            ((ViewGroup) menu.getActivityContentView()).removeView(subActionItem.view);
+            if(menu.isSystemOverlay()) {
+                WindowManager.LayoutParams lp = (WindowManager.LayoutParams) params;
+                lp.x = center.x - subActionItem.width / 2;
+                lp.y = center.y - subActionItem.height / 2;
+                subActionItem.view.setLayoutParams(lp);
+            }
+            else {
+                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) params;
+                lp.setMargins(center.x - subActionItem.width / 2, center.y - subActionItem.height / 2, 0, 0);
+                subActionItem.view.setLayoutParams(lp);
+            }
+            menu.removeViewFromCurrentContainer(subActionItem.view);
+//            ((ViewGroup) menu.getActivityContentView()).removeView(subActionItem.view);
         }
     }
 
