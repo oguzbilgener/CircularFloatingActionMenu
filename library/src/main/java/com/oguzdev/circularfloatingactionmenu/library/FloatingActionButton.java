@@ -83,6 +83,8 @@ public class FloatingActionButton extends FrameLayout {
      */
     public void setPosition(int position, ViewGroup.LayoutParams layoutParams) {
 
+        boolean setDefaultMargin = false;
+
         int gravity;
         switch (position) {
             case POSITION_TOP_CENTER:
@@ -108,6 +110,7 @@ public class FloatingActionButton extends FrameLayout {
                 break;
             case POSITION_BOTTOM_RIGHT:
             default:
+                setDefaultMargin = true;
                 gravity = Gravity.BOTTOM | Gravity.RIGHT;
                 break;
         }
@@ -125,6 +128,11 @@ public class FloatingActionButton extends FrameLayout {
             try {
                 WindowManager.LayoutParams lp = (WindowManager.LayoutParams) layoutParams;
                 lp.gravity = gravity;
+                if(setDefaultMargin) {
+                    int margin =  getContext().getResources().getDimensionPixelSize(R.dimen.action_button_margin);
+                    lp.x = margin;
+                    lp.y = margin;
+                }
                 setLayoutParams(lp);
             } catch(ClassCastException e) {
                 throw new ClassCastException("layoutParams must be an instance of " +
@@ -298,6 +306,7 @@ public class FloatingActionButton extends FrameLayout {
                     WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSLUCENT);
             params.format = PixelFormat.RGBA_8888;
+            params.gravity = Gravity.TOP | Gravity.LEFT;
             return params;
         }
     }

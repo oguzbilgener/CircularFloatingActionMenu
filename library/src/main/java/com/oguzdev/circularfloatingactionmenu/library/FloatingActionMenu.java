@@ -5,15 +5,17 @@ package com.oguzdev.circularfloatingactionmenu.library;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.hardware.SensorManager;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -51,8 +53,10 @@ public class FloatingActionMenu {
     private boolean open;
     /** whether the menu is an overlay for all other activities */
     private boolean systemOverlay;
-
+    /** a simple layout to contain all the sub action views in the system overlay mode */
     private FrameLayout overlayContainer;
+
+    private OrientationEventListener orientationListener;
 
     /**
      * Constructor that takes the parameters collected using {@link FloatingActionMenu.Builder}
@@ -64,7 +68,7 @@ public class FloatingActionMenu {
      * @param animationHandler
      * @param animated
      */
-    public FloatingActionMenu(View mainActionView,
+    public FloatingActionMenu(final View mainActionView,
                               int startAngle,
                               int endAngle,
                               int radius,
@@ -72,7 +76,7 @@ public class FloatingActionMenu {
                               MenuAnimationHandler animationHandler,
                               boolean animated,
                               MenuStateChangeListener stateChangeListener,
-                              boolean systemOverlay) {
+                              final boolean systemOverlay) {
         this.mainActionView = mainActionView;
         this.startAngle = startAngle;
         this.endAngle = endAngle;
@@ -118,6 +122,26 @@ public class FloatingActionMenu {
                 // Wait for the right time
                 item.view.post(new ItemViewQueueListener(item));
             }
+        }
+
+        if(systemOverlay) {
+            orientationListener = new OrientationEventListener(mainActionView.getContext(), SensorManager.SENSOR_DELAY_UI) {
+                private int lastState = -1;
+
+                public void onOrientationChanged(int orientation) {
+
+                    Display display = getWindowManager().getDefaultDisplay();
+                    if(display.getRotation() != lastState) {
+                        lastState = display.getRotation();
+
+                        //
+                        if(isOpen()) {
+                            close(false);
+                        }
+                    }
+                }
+            };
+            orientationListener.enable();
         }
     }
 
@@ -196,6 +220,7 @@ public class FloatingActionMenu {
         if(stateChangeListener != null) {
             stateChangeListener.onMenuOpened(this);
         }
+
     }
 
     /**
@@ -343,11 +368,6 @@ public class FloatingActionMenu {
             // get the x and y values of these points and set them to each of sub action items.
             subActionItems.get(i).x = (int) coords[0] - subActionItems.get(i).width / 2;
             subActionItems.get(i).y = (int) coords[1] - subActionItems.get(i).height / 2;
-
-            if(systemOverlay) {
-                // Android does not allow system overlay windows to be positioned outside of the screen
-                // TODO: hide items that have some of their parts out of the screen
-            }
         }
         return center;
     }
@@ -410,40 +430,47 @@ public class FloatingActionMenu {
 
     public void attachOverlayContainer() {
         try {
-            // calculate the minimum viable size of overlayContainer
-            WindowManager.LayoutParams overlayParams = getDefaultSystemWindowParams();
-            int left = 9999, right = 0, top = 9999, bottom = 0;
-            for(int i=0; i < subActionItems.size(); i++) {
-                int lm = subActionItems.get(i).x;
-                int tm = subActionItems.get(i).y;
-
-                if(lm < left) {
-                    left = lm;
-                }
-                if(tm < top) {
-                    top = tm;
-                }
-                if(lm + subActionItems.get(i).width > right) {
-                    right = lm + subActionItems.get(i).width;
-                }
-                if(tm + subActionItems.get(i).height > bottom) {
-                    bottom = tm + subActionItems.get(i).height;
-                }
-            }
-            overlayParams.width = right - left;
-            overlayParams.height = bottom - top;
-            overlayParams.x = left;
-            overlayParams.y = top;
-            overlayParams.gravity = Gravity.TOP | Gravity.LEFT;
+            WindowManager.LayoutParams overlayParams = calculateOverlayContainerParams();
 
             overlayContainer.setLayoutParams(overlayParams);
-            getWindowManager().addView(overlayContainer, overlayParams);
+            if(overlayContainer.getParent() == null) {
+                getWindowManager().addView(overlayContainer, overlayParams);
+            }
             getWindowManager().updateViewLayout(mainActionView, mainActionView.getLayoutParams());
         }
         catch(SecurityException e) {
             throw new SecurityException("Your application must have SYSTEM_ALERT_WINDOW " +
                     "permission to create a system window.");
         }
+    }
+
+    private WindowManager.LayoutParams calculateOverlayContainerParams() {
+        // calculate the minimum viable size of overlayContainer
+        WindowManager.LayoutParams overlayParams = getDefaultSystemWindowParams();
+        int left = 9999, right = 0, top = 9999, bottom = 0;
+        for(int i=0; i < subActionItems.size(); i++) {
+            int lm = subActionItems.get(i).x;
+            int tm = subActionItems.get(i).y;
+
+            if(lm < left) {
+                left = lm;
+            }
+            if(tm < top) {
+                top = tm;
+            }
+            if(lm + subActionItems.get(i).width > right) {
+                right = lm + subActionItems.get(i).width;
+            }
+            if(tm + subActionItems.get(i).height > bottom) {
+                bottom = tm + subActionItems.get(i).height;
+            }
+        }
+        overlayParams.width = right - left;
+        overlayParams.height = bottom - top;
+        overlayParams.x = left;
+        overlayParams.y = top;
+        overlayParams.gravity = Gravity.TOP | Gravity.LEFT;
+        return overlayParams;
     }
 
     public void detachOverlayContainer() {
@@ -702,4 +729,5 @@ public class FloatingActionMenu {
         params.gravity = Gravity.TOP | Gravity.LEFT;
         return params;
     }
+
 }

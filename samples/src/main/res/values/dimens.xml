@@ -9,7 +9,7 @@
     <dimen name="red_action_button_content_size">16dp</dimen>
     <dimen name="red_action_button_content_margin">36dp</dimen>
 
-    <dimen name="red_action_menu_radius">144dp</dimen>
+    <dimen name="red_action_menu_radius">96dp</dimen>
     <dimen name="blue_sub_action_button_size">48dp</dimen>
     <dimen name="blue_sub_action_button_content_margin">16dp</dimen>
 
