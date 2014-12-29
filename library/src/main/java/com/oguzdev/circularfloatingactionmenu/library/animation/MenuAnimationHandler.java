@@ -66,33 +66,36 @@ public abstract class MenuAnimationHandler {
         subActionItem.view.setScaleY(1);
         subActionItem.view.setAlpha(1);
         if(actionType == ActionType.OPENING) {
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) params;
             if(menu.isSystemOverlay()) {
-                WindowManager.LayoutParams lp = (WindowManager.LayoutParams) params;
-                lp.x = subActionItem.x;
-                lp.y = subActionItem.y;
-                subActionItem.view.setLayoutParams(lp);
+                WindowManager.LayoutParams overlayParams = (WindowManager.LayoutParams) menu.getOverlayContainer().getLayoutParams();
+                lp.setMargins(subActionItem.x - overlayParams.x, subActionItem.y - overlayParams.y, 0, 0);
             }
             else {
-                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) params;
                 lp.setMargins(subActionItem.x, subActionItem.y, 0, 0);
-                subActionItem.view.setLayoutParams(lp);
             }
+            subActionItem.view.setLayoutParams(lp);
         }
         else if(actionType == ActionType.CLOSING) {
             Point center = menu.getActionViewCenter();
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) params;
             if(menu.isSystemOverlay()) {
-                WindowManager.LayoutParams lp = (WindowManager.LayoutParams) params;
-                lp.x = center.x - subActionItem.width / 2;
-                lp.y = center.y - subActionItem.height / 2;
-                subActionItem.view.setLayoutParams(lp);
+                WindowManager.LayoutParams overlayParams = (WindowManager.LayoutParams) menu.getOverlayContainer().getLayoutParams();
+                lp.setMargins(center.x - overlayParams.x - subActionItem.width / 2, center.y - overlayParams.y - subActionItem.height / 2, 0, 0);
             }
             else {
-                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) params;
                 lp.setMargins(center.x - subActionItem.width / 2, center.y - subActionItem.height / 2, 0, 0);
-                subActionItem.view.setLayoutParams(lp);
             }
+            subActionItem.view.setLayoutParams(lp);
             menu.removeViewFromCurrentContainer(subActionItem.view);
-//            ((ViewGroup) menu.getActivityContentView()).removeView(subActionItem.view);
+
+            if(menu.isSystemOverlay()) {
+                // When all the views are removed from the overlay container,
+                // we also need to detach it
+                if (menu.getOverlayContainer().getChildCount() == 0) {
+                    menu.detachOverlayContainer();
+                }
+            }
         }
     }
 

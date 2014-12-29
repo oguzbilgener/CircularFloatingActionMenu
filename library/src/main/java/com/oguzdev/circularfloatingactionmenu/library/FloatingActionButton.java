@@ -294,7 +294,7 @@ public class FloatingActionButton extends FrameLayout {
             WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                     size,
                     size,
-                    WindowManager.LayoutParams.TYPE_PHONE,
+                    WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, // z-ordering
                     WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSLUCENT);
             params.format = PixelFormat.RGBA_8888;
