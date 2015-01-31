@@ -4,6 +4,7 @@
 package com.oguzdev.circularfloatingactionmenu.library;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.Gravity;
@@ -20,22 +21,22 @@ public class SubActionButton extends FrameLayout {
     public static final int THEME_LIGHTER = 2;
     public static final int THEME_DARKER = 3;
 
-    public SubActionButton(Activity activity, FrameLayout.LayoutParams layoutParams, int theme, Drawable backgroundDrawable, View contentView, FrameLayout.LayoutParams contentParams) {
-        super(activity);
+    public SubActionButton(Context context, FrameLayout.LayoutParams layoutParams, int theme, Drawable backgroundDrawable, View contentView, FrameLayout.LayoutParams contentParams) {
+        super(context);
         setLayoutParams(layoutParams);
         // If no custom backgroundDrawable is specified, use the background drawable of the theme.
         if(backgroundDrawable == null) {
             if(theme == THEME_LIGHT) {
-                backgroundDrawable = activity.getResources().getDrawable(R.drawable.button_sub_action_selector);
+                backgroundDrawable = context.getResources().getDrawable(R.drawable.button_sub_action_selector);
             }
             else if(theme == THEME_DARK) {
-                backgroundDrawable = activity.getResources().getDrawable(R.drawable.button_sub_action_dark_selector);
+                backgroundDrawable = context.getResources().getDrawable(R.drawable.button_sub_action_dark_selector);
             }
             else if(theme == THEME_LIGHTER) {
-                backgroundDrawable = activity.getResources().getDrawable(R.drawable.button_action_selector);
+                backgroundDrawable = context.getResources().getDrawable(R.drawable.button_action_selector);
             }
             else if(theme == THEME_DARKER) {
-                backgroundDrawable = activity.getResources().getDrawable(R.drawable.button_action_dark_selector);
+                backgroundDrawable = context.getResources().getDrawable(R.drawable.button_action_dark_selector);
             }
             else {
                 throw new RuntimeException("Unknown SubActionButton theme: " + theme);
@@ -89,18 +90,18 @@ public class SubActionButton extends FrameLayout {
      */
     public static class Builder {
 
-        private Activity activity;
+        private Context context;
         private FrameLayout.LayoutParams layoutParams;
         private int theme;
         private Drawable backgroundDrawable;
         private View contentView;
         private FrameLayout.LayoutParams contentParams;
 
-        public Builder(Activity activity) {
-            this.activity = activity;
+        public Builder(Context context) {
+            this.context = context;
 
             // Default SubActionButton settings
-            int size = activity.getResources().getDimensionPixelSize(R.dimen.sub_action_button_size);
+            int size = context.getResources().getDimensionPixelSize(R.dimen.sub_action_button_size);
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size, Gravity.TOP | Gravity.LEFT);
             setLayoutParams(params);
             setTheme(SubActionButton.THEME_LIGHT);
@@ -133,7 +134,7 @@ public class SubActionButton extends FrameLayout {
         }
 
         public SubActionButton build() {
-            return new SubActionButton(activity,
+            return new SubActionButton(context,
                     layoutParams,
                     theme,
                     backgroundDrawable,

@@ -1,9 +1,13 @@
 package com.oguzdev.circularfloatingactionmenu.samples;
 
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -11,7 +15,7 @@ import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 
-public class MenuWithFABActivity extends Activity {
+public class MenuWithFABActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,9 +24,9 @@ public class MenuWithFABActivity extends Activity {
 
         // Set up the white button on the lower right corner
         // more or less with default parameter
-        ImageView fabIconNew = new ImageView(this);
+        final ImageView fabIconNew = new ImageView(this);
         fabIconNew.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_new_light));
-        FloatingActionButton rightLowerButton = new FloatingActionButton.Builder(this)
+        final FloatingActionButton rightLowerButton = new FloatingActionButton.Builder(this)
                 .setContentView(fabIconNew)
                 .build();
 
@@ -39,13 +43,34 @@ public class MenuWithFABActivity extends Activity {
 
         // Build the menu with default options: light theme, 90 degrees, 72dp radius.
         // Set 4 default SubActionButtons
-        FloatingActionMenu rightLowerMenu = new FloatingActionMenu.Builder(this)
+        final FloatingActionMenu rightLowerMenu = new FloatingActionMenu.Builder(this)
                                                 .addSubActionView(rLSubBuilder.setContentView(rlIcon1).build())
                                                 .addSubActionView(rLSubBuilder.setContentView(rlIcon2).build())
                                                 .addSubActionView(rLSubBuilder.setContentView(rlIcon3).build())
                                                 .addSubActionView(rLSubBuilder.setContentView(rlIcon4).build())
                                                 .attachTo(rightLowerButton)
                                                 .build();
+
+        // Listen menu open and close events to animate the button content view
+        rightLowerMenu.setStateChangeListener(new FloatingActionMenu.MenuStateChangeListener() {
+            @Override
+            public void onMenuOpened(FloatingActionMenu menu) {
+                // Rotate the icon of rightLowerButton 45 degrees clockwise
+                fabIconNew.setRotation(0);
+                PropertyValuesHolder pvhR = PropertyValuesHolder.ofFloat(View.ROTATION, 45);
+                ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(fabIconNew, pvhR);
+                animation.start();
+            }
+
+            @Override
+            public void onMenuClosed(FloatingActionMenu menu) {
+                // Rotate the icon of rightLowerButton 45 degrees counter-clockwise
+                fabIconNew.setRotation(45);
+                PropertyValuesHolder pvhR = PropertyValuesHolder.ofFloat(View.ROTATION, 0);
+                ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(fabIconNew, pvhR);
+                animation.start();
+            }
+        });
 
         // Set up the large red button on the center right side
         // With custom button and content sizes and margins
@@ -73,7 +98,7 @@ public class MenuWithFABActivity extends Activity {
                                     redActionButtonContentMargin,
                                     redActionButtonContentMargin);
 
-        FloatingActionButton leftCenterButton = new FloatingActionButton.Builder(this)
+        final FloatingActionButton leftCenterButton = new FloatingActionButton.Builder(this)
                                                 .setContentView(fabIconStar, fabIconStarParams)
                                                 .setBackgroundDrawable(R.drawable.button_action_red_selector)
                                                 .setPosition(FloatingActionButton.POSITION_LEFT_CENTER)
@@ -107,7 +132,7 @@ public class MenuWithFABActivity extends Activity {
         lcIcon5.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_headphones));
 
         // Build another menu with custom options
-        FloatingActionMenu leftCenterMenu = new FloatingActionMenu.Builder(this)
+        final FloatingActionMenu leftCenterMenu = new FloatingActionMenu.Builder(this)
                 .addSubActionView(lCSubBuilder.setContentView(lcIcon1, blueContentParams).build())
                 .addSubActionView(lCSubBuilder.setContentView(lcIcon2, blueContentParams).build())
                 .addSubActionView(lCSubBuilder.setContentView(lcIcon3, blueContentParams).build())

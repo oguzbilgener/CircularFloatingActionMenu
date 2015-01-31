@@ -1,9 +1,9 @@
 package com.oguzdev.circularfloatingactionmenu.samples;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class DemoActivity extends Activity {
+public class DemoActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +64,8 @@ public class DemoActivity extends Activity {
             String[] items = { "Menu with FloatingActionButton",
                                "Menu attached to custom button",
                                "Menu with custom animation",
-                               "Menu in ScrollView"
+                               "Menu in ScrollView",
+                               "Menu as system overlay"
                             };
             ArrayAdapter<String> simpleAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, items);
             demosListView = (ListView) rootView.findViewById(R.id.demosListView);
@@ -87,6 +88,9 @@ public class DemoActivity extends Activity {
                     break;
                 case 3:
                     startActivity(new Intent(getActivity(), MenuInScrollViewActivity.class));
+                    break;
+                case 4:
+                    startActivity(new Intent(getActivity(), SystemOverlayMenuActivity.class));
                     break;
             }
         }

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.oguzdev.circularfloatingactionmenu.samples" >
 
-    <uses-sdk tools:node="replace" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
         android:allowBackup="true"
@@ -52,6 +52,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.oguzdev.circularfloatingactionmenu.samples.DemoActivity" />
         </activity>
+        <activity
+            android:name=".SystemOverlayMenuActivity"
+            android:label="@string/title_activity_system_overlay"
+            android:parentActivityName=".DemoActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.oguzdev.circularfloatingactionmenu.samples.DemoActivity" />
+        </activity>
+
+        <service
+            android:name=".SystemOverlayMenuService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

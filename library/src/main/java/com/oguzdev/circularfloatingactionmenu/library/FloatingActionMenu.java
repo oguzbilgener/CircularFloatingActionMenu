@@ -7,19 +7,25 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.hardware.SensorManager;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.oguzdev.circularfloatingactionmenu.library.animation.DefaultAnimationHandler;
 import com.oguzdev.circularfloatingactionmenu.library.animation.MenuAnimationHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides the main structure of the menu.
@@ -36,7 +42,7 @@ public class FloatingActionMenu {
     /** Distance of menu items from mainActionView */
     private int radius;
     /** List of menu items */
-    private ArrayList<Item> subActionItems;
+    private List<Item> subActionItems;
     /** Reference to the preferred {@link MenuAnimationHandler} object */
     private MenuAnimationHandler animationHandler;
     /** Reference to a listener that listens open/close actions */
@@ -45,6 +51,12 @@ public class FloatingActionMenu {
     private boolean animated;
     /** whether the menu is currently open or not */
     private boolean open;
+    /** whether the menu is an overlay for all other activities */
+    private boolean systemOverlay;
+    /** a simple layout to contain all the sub action views in the system overlay mode */
+    private FrameLayout overlayContainer;
+
+    private OrientationEventListener orientationListener;
 
     /**
      * Constructor that takes the parameters collected using {@link FloatingActionMenu.Builder}
@@ -56,14 +68,15 @@ public class FloatingActionMenu {
      * @param animationHandler
      * @param animated
      */
-    public FloatingActionMenu(View mainActionView,
+    public FloatingActionMenu(final View mainActionView,
                               int startAngle,
                               int endAngle,
                               int radius,
-                              ArrayList<Item> subActionItems,
+                              List<Item> subActionItems,
                               MenuAnimationHandler animationHandler,
                               boolean animated,
-                              MenuStateChangeListener stateChangeListener) {
+                              MenuStateChangeListener stateChangeListener,
+                              final boolean systemOverlay) {
         this.mainActionView = mainActionView;
         this.startAngle = startAngle;
         this.endAngle = endAngle;
@@ -71,6 +84,7 @@ public class FloatingActionMenu {
         this.subActionItems = subActionItems;
         this.animationHandler = animationHandler;
         this.animated = animated;
+        this.systemOverlay = systemOverlay;
         // The menu is initially closed.
         this.open = false;
 
@@ -86,17 +100,48 @@ public class FloatingActionMenu {
             animationHandler.setMenu(this);
         }
 
+        if(systemOverlay) {
+            overlayContainer = new FrameLayout(mainActionView.getContext());
+        }
+        else {
+            overlayContainer = null; // beware NullPointerExceptions!
+        }
+
         // Find items with undefined sizes
         for(final Item item : subActionItems) {
             if(item.width == 0 || item.height == 0) {
+                if(systemOverlay) {
+                    throw new RuntimeException("Sub action views cannot be added without " +
+                            "definite width and height.");
+                }
                 // Figure out the size by temporarily adding it to the Activity content view hierarchy
                 // and ask the size from the system
-                ((ViewGroup) getActivityContentView()).addView(item.view);
+                addViewToCurrentContainer(item.view);
                 // Make item view invisible, just in case
                 item.view.setAlpha(0);
                 // Wait for the right time
                 item.view.post(new ItemViewQueueListener(item));
             }
+        }
+
+        if(systemOverlay) {
+            orientationListener = new OrientationEventListener(mainActionView.getContext(), SensorManager.SENSOR_DELAY_UI) {
+                private int lastState = -1;
+
+                public void onOrientationChanged(int orientation) {
+
+                    Display display = getWindowManager().getDefaultDisplay();
+                    if(display.getRotation() != lastState) {
+                        lastState = display.getRotation();
+
+                        //
+                        if(isOpen()) {
+                            close(false);
+                        }
+                    }
+                }
+            };
+            orientationListener.enable();
         }
     }
 
@@ -105,10 +150,20 @@ public class FloatingActionMenu {
      * @param animated if true, this action is executed by the current {@link MenuAnimationHandler}
      */
     public void open(boolean animated) {
-        // Find the center of the action view
-        Point center = getActionViewCenter();
+
+        // Get the center of the action view from the following function for efficiency
         // populate destination x,y coordinates of Items
-        calculateItemPositions();
+        Point center = calculateItemPositions();
+
+        WindowManager.LayoutParams overlayParams = null;
+
+        if(systemOverlay) {
+            // If this is a system overlay menu, use the overlay container and place it behind
+            // the main action button so that all the views will be added into it.
+            attachOverlayContainer();
+
+            overlayParams = (WindowManager.LayoutParams) overlayContainer.getLayoutParams();
+        }
 
         if(animated && animationHandler != null) {
             // If animations are enabled and we have a MenuAnimationHandler, let it do the heavy work
@@ -124,12 +179,18 @@ public class FloatingActionMenu {
                 if (subActionItems.get(i).view.getParent() != null) {
                     throw new RuntimeException("All of the sub action items have to be independent from a parent.");
                 }
+
                 // Initially, place all items right at the center of the main action view
                 // Because they are supposed to start animating from that point.
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(subActionItems.get(i).width, subActionItems.get(i).height, Gravity.TOP | Gravity.LEFT);
-                params.setMargins(center.x - subActionItems.get(i).width / 2, center.y - subActionItems.get(i).height / 2, 0, 0);
-                //
-                ((ViewGroup) getActivityContentView()).addView(subActionItems.get(i).view, params);
+                final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(subActionItems.get(i).width, subActionItems.get(i).height, Gravity.TOP | Gravity.LEFT);
+
+                if(systemOverlay) {
+                    params.setMargins(center.x - overlayParams.x - subActionItems.get(i).width / 2, center.y - overlayParams.y - subActionItems.get(i).height / 2, 0, 0);
+                }
+                else {
+                    params.setMargins(center.x - subActionItems.get(i).width / 2, center.y - subActionItems.get(i).height / 2, 0, 0);
+                }
+                addViewToCurrentContainer(subActionItems.get(i).view, params);
             }
             // Tell the current MenuAnimationHandler to animate from the center
             animationHandler.animateMenuOpening(center);
@@ -138,12 +199,19 @@ public class FloatingActionMenu {
             // If animations are disabled, just place each of the items to their calculated destination positions.
             for (int i = 0; i < subActionItems.size(); i++) {
                 // This is currently done by giving them large margins
+
                 final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(subActionItems.get(i).width, subActionItems.get(i).height, Gravity.TOP | Gravity.LEFT);
-                params.setMargins(subActionItems.get(i).x, subActionItems.get(i).y, 0, 0);
-                subActionItems.get(i).view.setLayoutParams(params);
-                // Because they are placed into the main content view of the Activity,
-                // which is itself a FrameLayout
-                ((ViewGroup) getActivityContentView()).addView(subActionItems.get(i).view, params);
+                if(systemOverlay) {
+                    params.setMargins(subActionItems.get(i).x - overlayParams.x, subActionItems.get(i).y - overlayParams.y, 0, 0);
+                    subActionItems.get(i).view.setLayoutParams(params);
+                }
+                else {
+                    params.setMargins(subActionItems.get(i).x, subActionItems.get(i).y, 0, 0);
+                    subActionItems.get(i).view.setLayoutParams(params);
+                    // Because they are placed into the main content view of the Activity,
+                    // which is itself a FrameLayout
+                }
+                addViewToCurrentContainer(subActionItems.get(i).view, params);
             }
         }
         // do not forget to specify that the menu is open.
@@ -152,6 +220,7 @@ public class FloatingActionMenu {
         if(stateChangeListener != null) {
             stateChangeListener.onMenuOpened(this);
         }
+
     }
 
     /**
@@ -170,8 +239,9 @@ public class FloatingActionMenu {
         else {
             // If animations are disabled, just detach each of the Item views from the Activity content view.
             for (int i = 0; i < subActionItems.size(); i++) {
-                ((ViewGroup) getActivityContentView()).removeView(subActionItems.get(i).view);
+                removeViewFromCurrentContainer(subActionItems.get(i).view);
             }
+            detachOverlayContainer();
         }
         // do not forget to specify that the menu is now closed.
         open = false;
@@ -199,6 +269,17 @@ public class FloatingActionMenu {
      */
     public boolean isOpen() {
         return open;
+    }
+
+    /**
+     * @return whether the menu is a system overlay or not
+     */
+    public boolean isSystemOverlay() {
+        return systemOverlay;
+    }
+
+    public FrameLayout getOverlayContainer() {
+        return overlayContainer;
     }
 
     /**
@@ -231,16 +312,23 @@ public class FloatingActionMenu {
         int[] coords = new int[2];
         // This method returns a x and y values that can be larger than the dimensions of the device screen.
         mainActionView.getLocationOnScreen(coords);
-        Rect activityFrame = new Rect(); getActivityContentView().getWindowVisibleDisplayFrame(activityFrame);
+
         // So, we need to deduce the offsets.
-        coords[0] -= (getScreenSize().x - getActivityContentView().getMeasuredWidth());
-        coords[1] -= (activityFrame.height() + activityFrame.top - getActivityContentView().getMeasuredHeight());
+        if(systemOverlay) {
+            coords[1] -= getStatusBarHeight();
+        }
+        else {
+            Rect activityFrame = new Rect();
+            getActivityContentView().getWindowVisibleDisplayFrame(activityFrame);
+            coords[0] -= (getScreenSize().x - getActivityContentView().getMeasuredWidth());
+            coords[1] -= (activityFrame.height() + activityFrame.top - getActivityContentView().getMeasuredHeight());
+        }
         return new Point(coords[0], coords[1]);
     }
 
     /**
      * Returns the center point of the main action view
-     * @return
+     * @return the action view center point
      */
     public Point getActionViewCenter() {
         Point point = getActionViewCoordinates();
@@ -251,11 +339,12 @@ public class FloatingActionMenu {
 
     /**
      * Calculates the desired positions of all items.
+     * @return getActionViewCenter()
      */
-    private void calculateItemPositions() {
+    private Point calculateItemPositions() {
         // Create an arc that starts from startAngle and ends at endAngle
         // in an area that is as large as 4*radius^2
-        Point center = getActionViewCenter();
+        final Point center = getActionViewCenter();
         RectF area = new RectF(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
 
         Path orbit = new Path();
@@ -280,6 +369,7 @@ public class FloatingActionMenu {
             subActionItems.get(i).x = (int) coords[0] - subActionItems.get(i).width / 2;
             subActionItems.get(i).y = (int) coords[1] - subActionItems.get(i).height / 2;
         }
+        return center;
     }
 
     /**
@@ -292,7 +382,7 @@ public class FloatingActionMenu {
     /**
      * @return a reference to the sub action items list
      */
-    public ArrayList<Item> getSubActionItems() {
+    public List<Item> getSubActionItems() {
         return subActionItems;
     }
 
@@ -301,7 +391,112 @@ public class FloatingActionMenu {
      * @return the main content view
      */
     public View getActivityContentView() {
-        return ((Activity)mainActionView.getContext()).getWindow().getDecorView().findViewById(android.R.id.content);
+        try {
+            return ((Activity) mainActionView.getContext()).getWindow().getDecorView().findViewById(android.R.id.content);
+        }
+        catch(ClassCastException e) {
+            throw new ClassCastException("Please provide an Activity context for this FloatingActionMenu.");
+        }
+    }
+
+    /**
+     * Intended to use for systemOverlay mode.
+     * @return the WindowManager for the current context.
+     */
+    public WindowManager getWindowManager() {
+        return (WindowManager) mainActionView.getContext().getSystemService(Context.WINDOW_SERVICE);
+    }
+
+    private void addViewToCurrentContainer(View view, ViewGroup.LayoutParams layoutParams) {
+        if(systemOverlay) {
+            overlayContainer.addView(view, layoutParams);
+        }
+        else {
+            try {
+                if(layoutParams != null) {
+                    FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) layoutParams;
+                    ((ViewGroup) getActivityContentView()).addView(view, lp);
+                }
+                else {
+                    ((ViewGroup) getActivityContentView()).addView(view);
+                }
+            }
+            catch(ClassCastException e) {
+                throw new ClassCastException("layoutParams must be an instance of " +
+                        "FrameLayout.LayoutParams.");
+            }
+        }
+    }
+
+    public void attachOverlayContainer() {
+        try {
+            WindowManager.LayoutParams overlayParams = calculateOverlayContainerParams();
+
+            overlayContainer.setLayoutParams(overlayParams);
+            if(overlayContainer.getParent() == null) {
+                getWindowManager().addView(overlayContainer, overlayParams);
+            }
+            getWindowManager().updateViewLayout(mainActionView, mainActionView.getLayoutParams());
+        }
+        catch(SecurityException e) {
+            throw new SecurityException("Your application must have SYSTEM_ALERT_WINDOW " +
+                    "permission to create a system window.");
+        }
+    }
+
+    private WindowManager.LayoutParams calculateOverlayContainerParams() {
+        // calculate the minimum viable size of overlayContainer
+        WindowManager.LayoutParams overlayParams = getDefaultSystemWindowParams();
+        int left = 9999, right = 0, top = 9999, bottom = 0;
+        for(int i=0; i < subActionItems.size(); i++) {
+            int lm = subActionItems.get(i).x;
+            int tm = subActionItems.get(i).y;
+
+            if(lm < left) {
+                left = lm;
+            }
+            if(tm < top) {
+                top = tm;
+            }
+            if(lm + subActionItems.get(i).width > right) {
+                right = lm + subActionItems.get(i).width;
+            }
+            if(tm + subActionItems.get(i).height > bottom) {
+                bottom = tm + subActionItems.get(i).height;
+            }
+        }
+        overlayParams.width = right - left;
+        overlayParams.height = bottom - top;
+        overlayParams.x = left;
+        overlayParams.y = top;
+        overlayParams.gravity = Gravity.TOP | Gravity.LEFT;
+        return overlayParams;
+    }
+
+    public void detachOverlayContainer() {
+        getWindowManager().removeView(overlayContainer);
+    }
+
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = mainActionView.getContext().getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = mainActionView.getContext().getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    public void addViewToCurrentContainer(View view) {
+        addViewToCurrentContainer(view, null);
+    }
+
+    public void removeViewFromCurrentContainer(View view) {
+        if(systemOverlay) {
+            overlayContainer.removeView(view);
+        }
+        else {
+            ((ViewGroup)getActivityContentView()).removeView(view);
+        }
     }
 
     /**
@@ -310,7 +505,7 @@ public class FloatingActionMenu {
      */
     private Point getScreenSize() {
         Point size = new Point();
-        ((Activity)mainActionView.getContext()).getWindowManager().getDefaultDisplay().getSize(size);
+        getWindowManager().getDefaultDisplay().getSize(size);
         return size;
     }
 
@@ -355,9 +550,9 @@ public class FloatingActionMenu {
             item.height = item.view.getMeasuredHeight();
 
             // Revert everything back to normal
-            item.view.setAlpha(1);
+            item.view.setAlpha(item.alpha);
             // Remove the item view from view hierarchy
-            ((ViewGroup) getActivityContentView()).removeView(item.view);
+            removeViewFromCurrentContainer(item.view);
         }
     }
 
@@ -370,12 +565,15 @@ public class FloatingActionMenu {
         public int width;
         public int height;
 
+        public float alpha;
+
         public View view;
 
         public Item(View view, int width, int height) {
             this.view = view;
             this.width = width;
             this.height = height;
+            alpha = view.getAlpha();
             x = 0;
             y = 0;
         }
@@ -398,19 +596,25 @@ public class FloatingActionMenu {
         private int endAngle;
         private int radius;
         private View actionView;
-        private ArrayList<Item> subActionItems;
+        private List<Item> subActionItems;
         private MenuAnimationHandler animationHandler;
         private boolean animated;
         private MenuStateChangeListener stateChangeListener;
+        private boolean systemOverlay;
 
-        public Builder(Activity activity) {
+        public Builder(Context context, boolean systemOverlay) {
             subActionItems = new ArrayList<Item>();
             // Default settings
-            radius = activity.getResources().getDimensionPixelSize(R.dimen.action_menu_radius);
+            radius = context.getResources().getDimensionPixelSize(R.dimen.action_menu_radius);
             startAngle = 180;
             endAngle = 270;
             animationHandler = new DefaultAnimationHandler();
             animated = true;
+            this.systemOverlay = systemOverlay;
+        }
+
+        public Builder(Context context) {
+            this(context, false);
         }
 
         public Builder setStartAngle(int startAngle) {
@@ -436,9 +640,14 @@ public class FloatingActionMenu {
         /**
          * Adds a sub action view that is already alive, but not added to a parent View.
          * @param subActionView a view for the menu
-         * @return
+         * @return the builder object itself
          */
         public Builder addSubActionView(View subActionView) {
+            if(systemOverlay) {
+                throw new RuntimeException("Sub action views cannot be added without " +
+                        "definite width and height. Please use " +
+                        "other methods named addSubActionView");
+            }
             return this.addSubActionView(subActionView, 0, 0);
         }
 
@@ -446,7 +655,7 @@ public class FloatingActionMenu {
          * Inflates a new view from the specified resource id and adds it as a sub action view.
          * @param resId the resource id reference for the view
          * @param context a valid context
-         * @return
+         * @return the builder object itself
          */
         public Builder addSubActionView(int resId, Context context) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -458,7 +667,7 @@ public class FloatingActionMenu {
         /**
          * Sets the current animation handler to the specified MenuAnimationHandler child
          * @param animationHandler a MenuAnimationHandler child
-         * @return
+         * @return the builder object itself
          */
         public Builder setAnimationHandler(MenuAnimationHandler animationHandler) {
             this.animationHandler = animationHandler;
@@ -480,11 +689,16 @@ public class FloatingActionMenu {
             return this;
         }
 
+        public Builder setSystemOverlay(boolean systemOverlay) {
+            this.systemOverlay = systemOverlay;
+            return this;
+        }
+
         /**
          * Attaches the whole menu around a main action view, usually a button.
          * All the calculations are made according to this action view.
          * @param actionView
-         * @return
+         * @return the builder object itself
          */
         public Builder attachTo(View actionView) {
             this.actionView = actionView;
@@ -499,7 +713,21 @@ public class FloatingActionMenu {
                                           subActionItems,
                                           animationHandler,
                                           animated,
-                                          stateChangeListener);
+                                          stateChangeListener,
+                                          systemOverlay);
         }
     }
+
+    public static WindowManager.LayoutParams getDefaultSystemWindowParams() {
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT);
+        params.format = PixelFormat.RGBA_8888;
+        params.gravity = Gravity.TOP | Gravity.LEFT;
+        return params;
+    }
+
 }

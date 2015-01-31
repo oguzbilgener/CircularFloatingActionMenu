@@ -11,5 +11,6 @@
     <string name="title_activity_menu_with_custom_action_button">Custom Action Button</string>
     <string name="title_activity_menu_with_custom_animation">Custom Animation</string>
     <string name="title_activity_menu_in_scroll_view">Menu in ScrollView Sample</string>
+    <string name="title_activity_system_overlay">System Overlay Menu Sample</string>
 
 </resources>
