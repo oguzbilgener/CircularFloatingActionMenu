@@ -1,6 +1,5 @@
 package com.oguzdev.circularfloatingactionmenu.samples;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -11,14 +10,13 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 
 import java.util.ArrayList;
 
-public class MenuInScrollViewActivity extends ActionBarActivity implements FloatingActionMenu.MenuStateChangeListener, ViewTreeObserver.OnScrollChangedListener, View.OnLayoutChangeListener {
+public class MenuInScrollViewActivity extends ActionBarActivity implements FloatingActionMenu.MenuStateChangeListener, ViewTreeObserver.OnScrollChangedListener, MyScrollView.OnSizeChangeListener {
 
     private ArrayList<FloatingActionMenu> menus;
     private FloatingActionMenu currentMenu;
@@ -31,7 +29,7 @@ public class MenuInScrollViewActivity extends ActionBarActivity implements Float
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
+        final MyScrollView scrollView = (MyScrollView) findViewById(R.id.scrollView);
         LinearLayout scrollViewBody = (LinearLayout) findViewById(R.id.scrollViewBody);
 
         menus = new ArrayList<FloatingActionMenu>();
@@ -97,7 +95,8 @@ public class MenuInScrollViewActivity extends ActionBarActivity implements Float
                 .build();
 
         // Listen layout (size) changes on a main layout so that we could reposition the bottom menu
-        scrollView.addOnLayoutChangeListener(this);
+//        scrollView.addOnLayoutChangeListener(this);
+        scrollView.addSizeChangeListener(this);
     }
 
 
@@ -146,12 +145,18 @@ public class MenuInScrollViewActivity extends ActionBarActivity implements Float
         }
     }
 
+//    @Override
+//    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+//        // update the position of the menu when the main layout changes size on events like soft keyboard open/close
+//        if(right - left != 0 && bottom - top != 0 &&
+//                (oldLeft != left || oldTop != top || oldRight != right || oldBottom != bottom) && bottomMenu != null) {
+//            bottomMenu.updateItemPositions();
+//        }
+//    }
+
+
     @Override
-    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-        // update the position of the menu when the main layout changes size on events like soft keyboard open/close
-        if(right - left != 0 && bottom - top != 0 &&
-                (oldLeft != left || oldTop != top || oldRight != right || oldBottom != bottom) && bottomMenu != null) {
-            bottomMenu.updateItemPositions();
-        }
+    public void onSizeChange(View v, int w, int h, int oldw, int oldh) {
+        bottomMenu.updateItemPositions();
     }
 }
