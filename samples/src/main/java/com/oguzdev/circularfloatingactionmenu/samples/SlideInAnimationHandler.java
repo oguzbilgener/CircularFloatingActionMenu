@@ -1,15 +1,16 @@
 package com.oguzdev.circularfloatingactionmenu.samples;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.graphics.Point;
-import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 
+import com.nineoldandroids.animation.Animator;
+import com.nineoldandroids.animation.ObjectAnimator;
+import com.nineoldandroids.animation.PropertyValuesHolder;
+import com.nineoldandroids.view.ViewHelper;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
+import com.oguzdev.circularfloatingactionmenu.library.NineOldHelper;
 import com.oguzdev.circularfloatingactionmenu.library.animation.MenuAnimationHandler;
 
 /**
@@ -40,19 +41,19 @@ public class SlideInAnimationHandler extends MenuAnimationHandler {
         Animator lastAnimation = null;
         for (int i = 0; i < menu.getSubActionItems().size(); i++) {
 
-            menu.getSubActionItems().get(i).view.setAlpha(0);
+            ViewHelper.setAlpha(menu.getSubActionItems().get(i).view, 0);
 
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) menu.getSubActionItems().get(i).view.getLayoutParams();
             params.setMargins(menu.getSubActionItems().get(i).x, menu.getSubActionItems().get(i).y + DIST_Y, 0, 0);
             menu.getSubActionItems().get(i).view.setLayoutParams(params);
 
 //            PropertyValuesHolder pvhX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, menu.getSubActionItems().get(i).x/* - center.x + menu.getSubActionItems().get(i).width / 2*/);
-            PropertyValuesHolder pvhY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, -DIST_Y);
+            PropertyValuesHolder pvhY = PropertyValuesHolder.ofFloat("translationY", -DIST_Y);
 //            PropertyValuesHolder pvhsX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1);
 //            PropertyValuesHolder pvhsY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1);
-            PropertyValuesHolder pvhA = PropertyValuesHolder.ofFloat(View.ALPHA, 1);
+            PropertyValuesHolder pvhA = PropertyValuesHolder.ofFloat("alpha", 1);
 
-            final ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(menu.getSubActionItems().get(i).view, pvhY, pvhA);
+            final ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(NineOldHelper.getRealTarget(menu.getSubActionItems().get(i).view), pvhY, pvhA);
             animation.setDuration(DURATION);
             animation.setInterpolator(new DecelerateInterpolator());
             animation.addListener(new SubActionItemAnimationListener(menu.getSubActionItems().get(i), ActionType.OPENING));
@@ -79,12 +80,12 @@ public class SlideInAnimationHandler extends MenuAnimationHandler {
         Animator lastAnimation = null;
         for (int i = 0; i < menu.getSubActionItems().size(); i++) {
 //            PropertyValuesHolder pvhX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, - (menu.getSubActionItems().get(i).x - center.x + menu.getSubActionItems().get(i).width / 2));
-            PropertyValuesHolder pvhY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, DIST_Y);
+            PropertyValuesHolder pvhY = PropertyValuesHolder.ofFloat("translationY", DIST_Y);
 //            PropertyValuesHolder pvhsX = PropertyValuesHolder.ofFloat(View.SCALE_X, 0);
 //            PropertyValuesHolder pvhsY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 0);
-            PropertyValuesHolder pvhA = PropertyValuesHolder.ofFloat(View.ALPHA, 0);
+            PropertyValuesHolder pvhA = PropertyValuesHolder.ofFloat("alpha", 0);
 
-            final ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(menu.getSubActionItems().get(i).view, pvhY, pvhA);
+            final ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(NineOldHelper.getRealTarget(menu.getSubActionItems().get(i).view), pvhY, pvhA);
             animation.setDuration(DURATION);
             animation.setInterpolator(new AccelerateInterpolator());
             animation.addListener(new SubActionItemAnimationListener(menu.getSubActionItems().get(i), ActionType.CLOSING));

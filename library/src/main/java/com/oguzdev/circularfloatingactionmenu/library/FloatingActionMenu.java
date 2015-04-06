@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.nineoldandroids.view.ViewHelper;
 import com.oguzdev.circularfloatingactionmenu.library.animation.DefaultAnimationHandler;
 import com.oguzdev.circularfloatingactionmenu.library.animation.MenuAnimationHandler;
 
@@ -118,7 +119,7 @@ public class FloatingActionMenu {
                 // and ask the size from the system
                 addViewToCurrentContainer(item.view);
                 // Make item view invisible, just in case
-                item.view.setAlpha(0);
+                ViewHelper.setAlpha(item.view, 0);
                 // Wait for the right time
                 item.view.post(new ItemViewQueueListener(item));
             }
@@ -505,7 +506,13 @@ public class FloatingActionMenu {
      */
     private Point getScreenSize() {
         Point size = new Point();
-        getWindowManager().getDefaultDisplay().getSize(size);
+        if (android.os.Build.VERSION.SDK_INT >= 13) {
+            getWindowManager().getDefaultDisplay().getSize(size);
+        } else if (android.os.Build.VERSION.SDK_INT < 13) {
+            size.x = getWindowManager().getDefaultDisplay().getWidth();
+            size.y = getWindowManager().getDefaultDisplay().getHeight();
+        }
+
         return size;
     }
 
@@ -550,7 +557,7 @@ public class FloatingActionMenu {
             item.height = item.view.getMeasuredHeight();
 
             // Revert everything back to normal
-            item.view.setAlpha(item.alpha);
+            ViewHelper.setAlpha(item.view, item.alpha);
             // Remove the item view from view hierarchy
             removeViewFromCurrentContainer(item.view);
         }
@@ -573,7 +580,7 @@ public class FloatingActionMenu {
             this.view = view;
             this.width = width;
             this.height = height;
-            alpha = view.getAlpha();
+            alpha = ViewHelper.getAlpha(view);
             x = 0;
             y = 0;
         }

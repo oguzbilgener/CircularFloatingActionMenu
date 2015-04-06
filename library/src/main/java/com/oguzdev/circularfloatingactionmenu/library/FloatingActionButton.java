@@ -199,7 +199,7 @@ public class FloatingActionButton extends FrameLayout {
      */
     public View getActivityContentView() {
         try {
-            return ((Activity) getContext()).getWindow().getDecorView().findViewById(android.R.id.content);
+            return ((Activity) getContext()).findViewById(android.R.id.content);
         }
         catch(ClassCastException e) {
             throw new ClassCastException("Please provide an Activity context for this FloatingActionButton.");

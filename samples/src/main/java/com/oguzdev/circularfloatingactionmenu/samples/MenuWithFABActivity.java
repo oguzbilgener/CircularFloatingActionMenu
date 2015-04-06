@@ -1,16 +1,13 @@
 package com.oguzdev.circularfloatingactionmenu.samples;
 
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.nineoldandroids.animation.ObjectAnimator;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
@@ -56,19 +53,21 @@ public class MenuWithFABActivity extends ActionBarActivity {
             @Override
             public void onMenuOpened(FloatingActionMenu menu) {
                 // Rotate the icon of rightLowerButton 45 degrees clockwise
-                fabIconNew.setRotation(0);
-                PropertyValuesHolder pvhR = PropertyValuesHolder.ofFloat(View.ROTATION, 45);
-                ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(fabIconNew, pvhR);
-                animation.start();
+//                ViewHelper.setRotation(fabIconNew, 0);
+//                PropertyValuesHolder pvhR = PropertyValuesHolder.ofFloat("rotation", 45);
+//                ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(fabIconNew, pvhR);
+//                animation.start();
+                ObjectAnimator.ofFloat(fabIconNew, "rotation", 0, 45).setDuration(1000).start();
             }
 
             @Override
             public void onMenuClosed(FloatingActionMenu menu) {
                 // Rotate the icon of rightLowerButton 45 degrees counter-clockwise
-                fabIconNew.setRotation(45);
-                PropertyValuesHolder pvhR = PropertyValuesHolder.ofFloat(View.ROTATION, 0);
-                ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(fabIconNew, pvhR);
-                animation.start();
+//                ViewHelper.setRotation(fabIconNew, 45);
+//                PropertyValuesHolder pvhR = PropertyValuesHolder.ofFloat("rotation", 0);
+//                ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(fabIconNew, pvhR);
+//                animation.start();
+                ObjectAnimator.ofFloat(fabIconNew, "rotation", 45, 0).setDuration(1000).start();
             }
         });
 

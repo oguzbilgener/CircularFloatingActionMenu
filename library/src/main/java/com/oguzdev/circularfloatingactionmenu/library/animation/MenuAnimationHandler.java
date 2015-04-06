@@ -3,12 +3,13 @@
  */
 package com.oguzdev.circularfloatingactionmenu.library.animation;
 
-import android.animation.Animator;
 import android.graphics.Point;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.nineoldandroids.animation.Animator;
+import com.nineoldandroids.view.ViewHelper;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 
 /**
@@ -59,12 +60,12 @@ public abstract class MenuAnimationHandler {
      */
     protected void restoreSubActionViewAfterAnimation(FloatingActionMenu.Item subActionItem, ActionType actionType) {
         ViewGroup.LayoutParams params = subActionItem.view.getLayoutParams();
-        subActionItem.view.setTranslationX(0);
-        subActionItem.view.setTranslationY(0);
-        subActionItem.view.setRotation(0);
-        subActionItem.view.setScaleX(1);
-        subActionItem.view.setScaleY(1);
-        subActionItem.view.setAlpha(1);
+        ViewHelper.setTranslationX(subActionItem.view, 0);
+        ViewHelper.setTranslationY(subActionItem.view, 0);
+        ViewHelper.setRotation(subActionItem.view, 0);
+        ViewHelper.setScaleX(subActionItem.view, 1);
+        ViewHelper.setScaleY(subActionItem.view, 1);
+        ViewHelper.setAlpha(subActionItem.view, 1);
         if(actionType == ActionType.OPENING) {
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) params;
             if(menu.isSystemOverlay()) {
