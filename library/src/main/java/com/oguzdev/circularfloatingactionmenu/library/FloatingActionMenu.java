@@ -632,6 +632,15 @@ public class FloatingActionMenu {
             return this;
         }
 
+        public Builder setAnimationDuration(int durationInMillis) {
+            if (animationHandler == null) {
+                throw new IllegalStateException("Animation duration cannot be set " +
+                        "without an animationHandler.");
+            }
+            this.animationHandler.setDuration(durationInMillis);
+            return this;
+        }
+
         public Builder addSubActionView(View subActionView, int width, int height) {
             subActionItems.add(new Item(subActionView, width, height));
             return this;
