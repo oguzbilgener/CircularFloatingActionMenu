@@ -41,6 +41,8 @@ public class FloatingActionMenu {
     private int endAngle;
     /** Distance of menu items from mainActionView */
     private int radius;
+    /** Center of the menu items */
+    private View menuCenter;
     /** List of menu items */
     private List<Item> subActionItems;
     /** Reference to the preferred {@link MenuAnimationHandler} object */
@@ -72,6 +74,7 @@ public class FloatingActionMenu {
                               int startAngle,
                               int endAngle,
                               int radius,
+                              final View menuCenter,
                               List<Item> subActionItems,
                               MenuAnimationHandler animationHandler,
                               boolean animated,
@@ -81,6 +84,7 @@ public class FloatingActionMenu {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
         this.radius = radius;
+        this.menuCenter = menuCenter;
         this.subActionItems = subActionItems;
         this.animationHandler = animationHandler;
         this.animated = animated;
@@ -153,7 +157,8 @@ public class FloatingActionMenu {
 
         // Get the center of the action view from the following function for efficiency
         // populate destination x,y coordinates of Items
-        Point center = calculateItemPositions();
+        Point center = getViewCenter(mainActionView);
+        calculateItemPositions();
 
         WindowManager.LayoutParams overlayParams = null;
 
@@ -234,7 +239,7 @@ public class FloatingActionMenu {
                 // Do not proceed if there is an animation currently going on.
                 return;
             }
-            animationHandler.animateMenuClosing(getActionViewCenter());
+            animationHandler.animateMenuClosing(getViewCenter(mainActionView));
         }
         else {
             // If animations are disabled, just detach each of the Item views from the Activity content view.
@@ -246,7 +251,7 @@ public class FloatingActionMenu {
         // do not forget to specify that the menu is now closed.
         open = false;
 
-        if(stateChangeListener != null) {
+        if (stateChangeListener != null) {
             stateChangeListener.onMenuClosed(this);
         }
     }
@@ -308,10 +313,10 @@ public class FloatingActionMenu {
      * such as when a user clicks the action button.
      * @return a Point containing x and y coordinates of the top left corner of action view
      */
-    private Point getActionViewCoordinates() {
+    private Point getViewCoordinates(View view) {
         int[] coords = new int[2];
         // This method returns a x and y values that can be larger than the dimensions of the device screen.
-        mainActionView.getLocationOnScreen(coords);
+        view.getLocationOnScreen(coords);
 
         // So, we need to deduce the offsets.
         if(systemOverlay) {
@@ -327,14 +332,26 @@ public class FloatingActionMenu {
     }
 
     /**
+     * Returns the center point of the view
+     * @return the view center point
+     */
+    public Point getViewCenter(View view) {
+        Point point = getViewCoordinates(view);
+        point.x += view.getMeasuredWidth() / 2;
+        point.y += view.getMeasuredHeight() / 2;
+        return point;
+    }
+
+    /**
      * Returns the center point of the main action view
      * @return the action view center point
      */
     public Point getActionViewCenter() {
-        Point point = getActionViewCoordinates();
-        point.x += mainActionView.getMeasuredWidth() / 2;
-        point.y += mainActionView.getMeasuredHeight() / 2;
-        return point;
+        return getViewCenter(mainActionView);
+    }
+
+    public View getMenuCenter() {
+        return menuCenter == null ? mainActionView : menuCenter;
     }
 
     /**
@@ -344,7 +361,7 @@ public class FloatingActionMenu {
     private Point calculateItemPositions() {
         // Create an arc that starts from startAngle and ends at endAngle
         // in an area that is as large as 4*radius^2
-        final Point center = getActionViewCenter();
+        final Point center = getViewCenter(getMenuCenter());
         RectF area = new RectF(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
 
         Path orbit = new Path();
@@ -595,6 +612,7 @@ public class FloatingActionMenu {
         private int startAngle;
         private int endAngle;
         private int radius;
+        private View menuCenter;
         private View actionView;
         private List<Item> subActionItems;
         private MenuAnimationHandler animationHandler;
@@ -703,6 +721,11 @@ public class FloatingActionMenu {
             return this;
         }
 
+        public Builder setMenuCenter(View menuCenter) {
+            this.menuCenter = menuCenter;
+            return this;
+        }
+
         /**
          * Attaches the whole menu around a main action view, usually a button.
          * All the calculations are made according to this action view.
@@ -719,6 +742,7 @@ public class FloatingActionMenu {
                                           startAngle,
                                           endAngle,
                                           radius,
+                                          menuCenter,
                                           subActionItems,
                                           animationHandler,
                                           animated,
