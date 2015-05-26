@@ -1,6 +1,5 @@
 package com.oguzdev.circularfloatingactionmenu.samples;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -64,6 +63,7 @@ public class MenuWithCustomActionButtonActivity extends ActionBarActivity {
 
             // Our action button is this time just a regular view!
             Button centerActionButton = (Button) rootView.findViewById(R.id.centerActionButton);
+            View menuCenter = rootView.findViewById(R.id.menu_center);
 
             // Add some items to the menu. They are regular views as well!
             TextView a = new TextView(getActivity()); a.setText("a"); a.setBackgroundResource(android.R.drawable.btn_default_small);
@@ -90,6 +90,7 @@ public class MenuWithCustomActionButtonActivity extends ActionBarActivity {
                     .setStartAngle(0) // A whole circle!
                     .setEndAngle(360)
                     .setRadius(getResources().getDimensionPixelSize(R.dimen.radius_large))
+                    .setMenuCenter(menuCenter)
                     .addSubActionView(a)
                     .addSubActionView(b)
                     .addSubActionView(c)
