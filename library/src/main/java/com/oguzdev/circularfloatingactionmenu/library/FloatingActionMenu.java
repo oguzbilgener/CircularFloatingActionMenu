@@ -246,7 +246,9 @@ public class FloatingActionMenu {
             for (int i = 0; i < subActionItems.size(); i++) {
                 removeViewFromCurrentContainer(subActionItems.get(i).view);
             }
-            detachOverlayContainer();
+            if (isSystemOverlay()) {
+                detachOverlayContainer();
+            }
         }
         // do not forget to specify that the menu is now closed.
         open = false;
