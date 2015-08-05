@@ -47,6 +47,8 @@ public class FloatingActionMenu {
     private MenuAnimationHandler animationHandler;
     /** Reference to a listener that listens open/close actions */
     private MenuStateChangeListener stateChangeListener;
+    /** Reference to a listener that listens click sub action button */
+    private OnSubActionButtonClickListener subButtonClickListener;
     /** whether the openings and closings should be animated or not */
     private boolean animated;
     /** whether the menu is currently open or not */
@@ -108,7 +110,9 @@ public class FloatingActionMenu {
         }
 
         // Find items with undefined sizes
-        for(final Item item : subActionItems) {
+        for (int i = 0; i < subActionItems.size(); i++) {
+            final int index = i;
+            Item item = subActionItems.get(i);
             if(item.width == 0 || item.height == 0) {
                 if(systemOverlay) {
                     throw new RuntimeException("Sub action views cannot be added without " +
@@ -122,6 +126,14 @@ public class FloatingActionMenu {
                 // Wait for the right time
                 item.view.post(new ItemViewQueueListener(item));
             }
+            item.view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(subButtonClickListener != null){
+                        subButtonClickListener.onSubButtonClick(FloatingActionMenu.this, index);
+                    }
+                }
+            });
         }
 
         if(systemOverlay) {
@@ -513,6 +525,10 @@ public class FloatingActionMenu {
         this.stateChangeListener = listener;
     }
 
+    public void setOnSubButtonClickListener(OnSubActionButtonClickListener listener) {
+        this.subButtonClickListener = listener;
+    }
+
     /**
      * A simple click listener used by the main action view
      */
@@ -585,6 +601,13 @@ public class FloatingActionMenu {
     public static interface MenuStateChangeListener {
         public void onMenuOpened(FloatingActionMenu menu);
         public void onMenuClosed(FloatingActionMenu menu);
+    }
+
+    /**
+     * A listener to listen click of sub action button
+     */
+    public static interface OnSubActionButtonClickListener {
+        public void onSubButtonClick(FloatingActionMenu menu,int index);
     }
 
     /**
