@@ -42,7 +42,7 @@ public class FloatingActionMenu {
     /** Distance of menu items from mainActionView */
     private int radius;
     /** Center of the menu items */
-    private View menuCenter;
+    private Point menuCenter;
     /** List of menu items */
     private List<Item> subActionItems;
     /** Reference to the preferred {@link MenuAnimationHandler} object */
@@ -74,7 +74,7 @@ public class FloatingActionMenu {
                               int startAngle,
                               int endAngle,
                               int radius,
-                              final View menuCenter,
+                              final Point menuCenter,
                               List<Item> subActionItems,
                               MenuAnimationHandler animationHandler,
                               boolean animated,
@@ -352,8 +352,8 @@ public class FloatingActionMenu {
         return getViewCenter(mainActionView);
     }
 
-    public View getMenuCenter() {
-        return menuCenter == null ? mainActionView : menuCenter;
+    public Point getMenuCenter() {
+        return menuCenter == null ? getActionViewCenter() : menuCenter;
     }
 
     /**
@@ -363,7 +363,7 @@ public class FloatingActionMenu {
     private Point calculateItemPositions() {
         // Create an arc that starts from startAngle and ends at endAngle
         // in an area that is as large as 4*radius^2
-        final Point center = getViewCenter(getMenuCenter());
+        final Point center = getMenuCenter();
         RectF area = new RectF(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
 
         Path orbit = new Path();
@@ -614,7 +614,7 @@ public class FloatingActionMenu {
         private int startAngle;
         private int endAngle;
         private int radius;
-        private View menuCenter;
+        private Point menuCenter;
         private View actionView;
         private List<Item> subActionItems;
         private MenuAnimationHandler animationHandler;
@@ -723,7 +723,7 @@ public class FloatingActionMenu {
             return this;
         }
 
-        public Builder setMenuCenter(View menuCenter) {
+        public Builder setMenuCenter(Point menuCenter) {
             this.menuCenter = menuCenter;
             return this;
         }
