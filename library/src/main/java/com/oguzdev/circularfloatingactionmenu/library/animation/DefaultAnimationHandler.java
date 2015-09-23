@@ -19,8 +19,6 @@ import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
  */
 public class DefaultAnimationHandler extends MenuAnimationHandler {
 
-    /** duration of animations, in milliseconds */
-    protected static final int DURATION = 500;
     /** duration to wait between each of  */
     protected static final int LAG_BETWEEN_ITEMS = 20;
     /** holds the current state of animation */
@@ -51,7 +49,7 @@ public class DefaultAnimationHandler extends MenuAnimationHandler {
             PropertyValuesHolder pvhA = PropertyValuesHolder.ofFloat(View.ALPHA, 1);
 
             final ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(menu.getSubActionItems().get(i).view, pvhX, pvhY, pvhR, pvhsX, pvhsY, pvhA);
-            animation.setDuration(DURATION);
+            animation.setDuration(getDuration());
             animation.setInterpolator(new OvershootInterpolator(0.9f));
             animation.addListener(new SubActionItemAnimationListener(menu.getSubActionItems().get(i), ActionType.OPENING));
 
@@ -85,7 +83,7 @@ public class DefaultAnimationHandler extends MenuAnimationHandler {
             PropertyValuesHolder pvhA = PropertyValuesHolder.ofFloat(View.ALPHA, 0);
 
             final ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(menu.getSubActionItems().get(i).view, pvhX, pvhY, pvhR, pvhsX, pvhsY, pvhA);
-            animation.setDuration(DURATION);
+            animation.setDuration(getDuration());
             animation.setInterpolator(new AccelerateDecelerateInterpolator());
             animation.addListener(new SubActionItemAnimationListener(menu.getSubActionItems().get(i), ActionType.CLOSING));
 

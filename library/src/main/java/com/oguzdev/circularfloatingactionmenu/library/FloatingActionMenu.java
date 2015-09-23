@@ -41,6 +41,8 @@ public class FloatingActionMenu {
     private int endAngle;
     /** Distance of menu items from mainActionView */
     private int radius;
+    /** Center of the menu items */
+    private Point menuCenter;
     /** List of menu items */
     private List<Item> subActionItems;
     /** Reference to the preferred {@link MenuAnimationHandler} object */
@@ -72,6 +74,7 @@ public class FloatingActionMenu {
                               int startAngle,
                               int endAngle,
                               int radius,
+                              final Point menuCenter,
                               List<Item> subActionItems,
                               MenuAnimationHandler animationHandler,
                               boolean animated,
@@ -81,6 +84,7 @@ public class FloatingActionMenu {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
         this.radius = radius;
+        this.menuCenter = menuCenter;
         this.subActionItems = subActionItems;
         this.animationHandler = animationHandler;
         this.animated = animated;
@@ -114,13 +118,10 @@ public class FloatingActionMenu {
                     throw new RuntimeException("Sub action views cannot be added without " +
                             "definite width and height.");
                 }
-                // Figure out the size by temporarily adding it to the Activity content view hierarchy
-                // and ask the size from the system
-                addViewToCurrentContainer(item.view);
-                // Make item view invisible, just in case
-                item.view.setAlpha(0);
-                // Wait for the right time
-                item.view.post(new ItemViewQueueListener(item));
+                int undefinedSize = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+                item.view.measure(undefinedSize, undefinedSize);
+                item.width = item.view.getMeasuredWidth();
+                item.height = item.view.getMeasuredHeight();
             }
         }
 
@@ -153,7 +154,8 @@ public class FloatingActionMenu {
 
         // Get the center of the action view from the following function for efficiency
         // populate destination x,y coordinates of Items
-        Point center = calculateItemPositions();
+        Point center = getViewCenter(mainActionView);
+        calculateItemPositions();
 
         WindowManager.LayoutParams overlayParams = null;
 
@@ -234,19 +236,21 @@ public class FloatingActionMenu {
                 // Do not proceed if there is an animation currently going on.
                 return;
             }
-            animationHandler.animateMenuClosing(getActionViewCenter());
+            animationHandler.animateMenuClosing(getViewCenter(mainActionView));
         }
         else {
             // If animations are disabled, just detach each of the Item views from the Activity content view.
             for (int i = 0; i < subActionItems.size(); i++) {
                 removeViewFromCurrentContainer(subActionItems.get(i).view);
             }
-            detachOverlayContainer();
+            if (isSystemOverlay()) {
+                detachOverlayContainer();
+            }
         }
         // do not forget to specify that the menu is now closed.
         open = false;
 
-        if(stateChangeListener != null) {
+        if (stateChangeListener != null) {
             stateChangeListener.onMenuClosed(this);
         }
     }
@@ -308,10 +312,10 @@ public class FloatingActionMenu {
      * such as when a user clicks the action button.
      * @return a Point containing x and y coordinates of the top left corner of action view
      */
-    private Point getActionViewCoordinates() {
+    private Point getViewCoordinates(View view) {
         int[] coords = new int[2];
         // This method returns a x and y values that can be larger than the dimensions of the device screen.
-        mainActionView.getLocationOnScreen(coords);
+        view.getLocationOnScreen(coords);
 
         // So, we need to deduce the offsets.
         if(systemOverlay) {
@@ -327,14 +331,26 @@ public class FloatingActionMenu {
     }
 
     /**
+     * Returns the center point of the view
+     * @return the view center point
+     */
+    public Point getViewCenter(View view) {
+        Point point = getViewCoordinates(view);
+        point.x += view.getMeasuredWidth() / 2;
+        point.y += view.getMeasuredHeight() / 2;
+        return point;
+    }
+
+    /**
      * Returns the center point of the main action view
      * @return the action view center point
      */
     public Point getActionViewCenter() {
-        Point point = getActionViewCoordinates();
-        point.x += mainActionView.getMeasuredWidth() / 2;
-        point.y += mainActionView.getMeasuredHeight() / 2;
-        return point;
+        return getViewCenter(mainActionView);
+    }
+
+    public Point getMenuCenter() {
+        return menuCenter == null ? getActionViewCenter() : menuCenter;
     }
 
     /**
@@ -344,7 +360,7 @@ public class FloatingActionMenu {
     private Point calculateItemPositions() {
         // Create an arc that starts from startAngle and ends at endAngle
         // in an area that is as large as 4*radius^2
-        final Point center = getActionViewCenter();
+        final Point center = getMenuCenter();
         RectF area = new RectF(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
 
         Path orbit = new Path();
@@ -525,38 +541,6 @@ public class FloatingActionMenu {
     }
 
     /**
-     * This runnable calculates sizes of Item views that are added to the menu.
-     */
-    private class ItemViewQueueListener implements Runnable {
-
-        private static final int MAX_TRIES = 10;
-        private Item item;
-        private int tries;
-
-        public ItemViewQueueListener(Item item) {
-            this.item = item;
-            this.tries = 0;
-        }
-
-        @Override
-        public void run() {
-            // Wait until the the view can be measured but do not push too hard.
-            if(item.view.getMeasuredWidth() == 0 && tries < MAX_TRIES) {
-                item.view.post(this);
-                return;
-            }
-            // Measure the size of the item view
-            item.width = item.view.getMeasuredWidth();
-            item.height = item.view.getMeasuredHeight();
-
-            // Revert everything back to normal
-            item.view.setAlpha(item.alpha);
-            // Remove the item view from view hierarchy
-            removeViewFromCurrentContainer(item.view);
-        }
-    }
-
-    /**
      * A simple structure to put a view and its x, y, width and height values together
      */
     public static class Item {
@@ -595,6 +579,7 @@ public class FloatingActionMenu {
         private int startAngle;
         private int endAngle;
         private int radius;
+        private Point menuCenter;
         private View actionView;
         private List<Item> subActionItems;
         private MenuAnimationHandler animationHandler;
@@ -629,6 +614,15 @@ public class FloatingActionMenu {
 
         public Builder setRadius(int radius) {
             this.radius = radius;
+            return this;
+        }
+
+        public Builder setAnimationDuration(int durationInMillis) {
+            if (animationHandler == null) {
+                throw new IllegalStateException("Animation duration cannot be set " +
+                        "without an animationHandler.");
+            }
+            this.animationHandler.setDuration(durationInMillis);
             return this;
         }
 
@@ -694,6 +688,11 @@ public class FloatingActionMenu {
             return this;
         }
 
+        public Builder setMenuCenter(Point menuCenter) {
+            this.menuCenter = menuCenter;
+            return this;
+        }
+
         /**
          * Attaches the whole menu around a main action view, usually a button.
          * All the calculations are made according to this action view.
@@ -710,6 +709,7 @@ public class FloatingActionMenu {
                                           startAngle,
                                           endAngle,
                                           radius,
+                                          menuCenter,
                                           subActionItems,
                                           animationHandler,
                                           animated,

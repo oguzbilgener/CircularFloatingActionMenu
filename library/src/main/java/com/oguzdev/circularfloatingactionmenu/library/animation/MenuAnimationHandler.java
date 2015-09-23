@@ -21,6 +21,9 @@ public abstract class MenuAnimationHandler {
 
     protected FloatingActionMenu menu;
 
+    /** duration of animations, in milliseconds */
+    private int duration = 500;
+
     public MenuAnimationHandler() {
     }
 
@@ -97,6 +100,14 @@ public abstract class MenuAnimationHandler {
                 }
             }
         }
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     /**
