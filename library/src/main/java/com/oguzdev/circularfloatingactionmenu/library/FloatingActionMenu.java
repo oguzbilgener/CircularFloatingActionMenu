@@ -12,6 +12,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.hardware.SensorManager;
+import android.support.v7.widget.TintContextWrapper;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -392,9 +393,12 @@ public class FloatingActionMenu {
      */
     public View getActivityContentView() {
         try {
-            return ((Activity) mainActionView.getContext()).getWindow().getDecorView().findViewById(android.R.id.content);
-        }
-        catch(ClassCastException e) {
+            if (mainActionView.getContext() instanceof TintContextWrapper) {
+                return ((Activity) ((TintContextWrapper) mainActionView.getContext()).getBaseContext()).getWindow().getDecorView().findViewById(android.R.id.content);
+            } else {
+                return ((Activity) mainActionView.getContext()).getWindow().getDecorView().findViewById(android.R.id.content);
+            }
+        } catch (ClassCastException e) {
             throw new ClassCastException("Please provide an Activity context for this FloatingActionMenu.");
         }
     }
