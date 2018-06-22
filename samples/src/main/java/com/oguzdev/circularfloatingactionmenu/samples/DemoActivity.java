@@ -65,7 +65,8 @@ public class DemoActivity extends ActionBarActivity {
                                "Menu attached to custom button",
                                "Menu with custom animation",
                                "Menu in ScrollView",
-                               "Menu as system overlay"
+                               "Menu as system overlay",
+                               "Alt Centered"
                             };
             ArrayAdapter<String> simpleAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, items);
             demosListView = (ListView) rootView.findViewById(R.id.demosListView);
@@ -91,6 +92,9 @@ public class DemoActivity extends ActionBarActivity {
                     break;
                 case 4:
                     startActivity(new Intent(getActivity(), SystemOverlayMenuActivity.class));
+                    break;
+                case 5:
+                    startActivity(new Intent(getActivity(), MenuAltCenteredActivity.class));
                     break;
             }
         }
