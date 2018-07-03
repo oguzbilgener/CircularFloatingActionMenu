@@ -60,6 +60,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.oguzdev.circularfloatingactionmenu.samples.DemoActivity" />
         </activity>
+        <activity
+            android:name=".MenuAltCenteredActivity"
+            android:label="@string/title_activity_menu_with_fab"
+            android:parentActivityName=".DemoActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.oguzdev.circularfloatingactionmenu.samples.DemoActivity" />
+        </activity>
 
         <service
             android:name=".SystemOverlayMenuService"
