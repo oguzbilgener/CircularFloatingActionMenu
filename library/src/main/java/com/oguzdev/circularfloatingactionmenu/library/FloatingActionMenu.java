@@ -35,8 +35,10 @@ public class FloatingActionMenu {
 
     /** Reference to the view (usually a button) to trigger the menu to show */
     private View mainActionView;
-    /** Optional reference to the view around which to center the menu (if differs from mainActionView */
+    /** Optional reference to the view around which to center the menu (if differs from mainActionView) */
     private View centeringView;
+    /** Optional reference to a point around which to center the menu. If specified this will take precedence over centeringView. */
+    private Point centeringPoint;
     /** The angle (in degrees, modulus 360) which the circular menu starts from  */
     private int startAngle;
     /** The angle (in degrees, modulus 360) which the circular menu ends at  */
@@ -64,6 +66,7 @@ public class FloatingActionMenu {
      * Constructor that takes the parameters collected using {@link FloatingActionMenu.Builder}
      * @param mainActionView
      * @param centeringView
+     * @param centeringPoint
      * @param startAngle
      * @param endAngle
      * @param radius
@@ -75,6 +78,7 @@ public class FloatingActionMenu {
      */
     public FloatingActionMenu(final View mainActionView,
                               final View centeringView,
+                              final Point centeringPoint,
                               int startAngle,
                               int endAngle,
                               int radius,
@@ -85,6 +89,7 @@ public class FloatingActionMenu {
                               final boolean systemOverlay) {
         this.mainActionView = mainActionView;
         this.centeringView = centeringView;
+        this.centeringPoint = centeringPoint;
         this.startAngle = startAngle;
         this.endAngle = endAngle;
         this.radius = radius;
@@ -345,17 +350,19 @@ public class FloatingActionMenu {
     }
 
     /**
-     * Returns the center point of the centering view
+     * Returns the center point of the centering view or point
      * @return the action view center point
      */
     public Point getMenuCenter() {
-        if (centeringView == null) {
-            return getActionViewCenter();
-        } else {
+        if (centeringPoint != null) {
+            return centeringPoint;
+        } else if (centeringView != null) {
             Point point = getViewCoordinates(centeringView);
             point.x += centeringView.getMeasuredWidth() / 2;
             point.y += centeringView.getMeasuredHeight() / 2;
             return point;
+        } else {
+            return getActionViewCenter();
         }
     }
 
@@ -620,6 +627,7 @@ public class FloatingActionMenu {
         private int radius;
         private View actionView;
         private View centeringView;
+        private Point centeringPoint;
         private List<Item> subActionItems;
         private MenuAnimationHandler animationHandler;
         private boolean animated;
@@ -734,9 +742,15 @@ public class FloatingActionMenu {
             return this;
         }
 
+        public Builder centerAt(Point centeringPoint) {
+            this.centeringPoint = centeringPoint;
+            return this;
+        }
+
         public FloatingActionMenu build() {
             return new FloatingActionMenu(actionView,
                                           centeringView,
+                                          centeringPoint,
                                           startAngle,
                                           endAngle,
                                           radius,
