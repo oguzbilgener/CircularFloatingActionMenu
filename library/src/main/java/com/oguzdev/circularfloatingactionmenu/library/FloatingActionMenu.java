@@ -90,10 +90,8 @@ public class FloatingActionMenu {
 
         this.stateChangeListener = stateChangeListener;
 
-        // Listen click events on the main action view
-        // In the future, touch and drag events could be listened to offer an alternative behaviour
-        this.mainActionView.setClickable(true);
-        this.mainActionView.setOnClickListener(new ActionViewClickListener());
+        //Add default click interaction event to action view
+        AddInterationEvents(this.mainActionView);
 
         // Do not forget to set the menu as self to our customizable animation handler
         if(animationHandler != null) {
@@ -143,6 +141,18 @@ public class FloatingActionMenu {
             };
             orientationListener.enable();
         }
+    }
+
+    /**
+     * Method to add interaction events to mainActionView.
+     * Can be overriden to attach other interaction handlers.
+     * @param View to attach interaction events to
+     */
+    protected void AddInterationEvents(View v) {
+        // Listen click events on the main action view
+        // In the future, touch and drag events could be listened to offer an alternative behaviour
+        v.setClickable(true);
+        v.setOnClickListener(new ActionViewClickListener());
     }
 
     /**
